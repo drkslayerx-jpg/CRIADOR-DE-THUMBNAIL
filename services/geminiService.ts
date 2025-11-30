@@ -1,29 +1,5 @@
 import { GoogleGenAI, GenerateContentResponse } from "@google/genai";
 
-// Helper to resolve API Key from various build environments (Vite, CRA, Node)
-const getApiKey = (): string => {
-  let key = '';
-  
-  // 1. Try Vite standard (import.meta.env)
-  try {
-    // @ts-ignore
-    if (import.meta && import.meta.env) {
-      // @ts-ignore
-      key = import.meta.env.VITE_API_KEY || import.meta.env.API_KEY || '';
-    }
-  } catch (e) {}
-
-  // 2. Try Node/CRA standard (process.env)
-  if (!key && typeof process !== 'undefined' && process.env) {
-    key = process.env.API_KEY || 
-          process.env.REACT_APP_API_KEY || 
-          process.env.NEXT_PUBLIC_API_KEY || 
-          '';
-  }
-
-  return key;
-};
-
 export const generateBackgroundImage = async (
   title: string,
   description: string,
@@ -31,15 +7,9 @@ export const generateBackgroundImage = async (
   aspectRatio: string = "16:9"
 ): Promise<string> => {
   
-  const apiKey = getApiKey();
-  
-  if (!apiKey) {
-    throw new Error("MISSING_API_KEY");
-  }
+  // Use process.env.API_KEY directly as per strict guidelines
+  const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
 
-  const ai = new GoogleGenAI({ apiKey });
-
-  // Optimized prompt to focus purely on visual composition
   const prompt = `
     Create a stunning, high-quality YouTube thumbnail background image.
     
@@ -88,34 +58,23 @@ export const generateBackgroundImage = async (
   } catch (error: any) {
     console.error("Gemini Error:", error);
     
-    if (error.message === "MISSING_API_KEY") {
-      throw error;
-    }
-
-    // Check for standard Google SDK error regarding missing API Key inside the SDK
-    if (error.message?.includes("API Key") || error.message?.includes("API_KEY")) {
-      throw new Error("MISSING_API_KEY");
-    }
-
-    if (error.message?.includes("SAFETY")) {
+    // Tratamento de erros específicos
+    const msg = (error.message || "").toLowerCase();
+    
+    if (msg.includes("safety")) {
       throw new Error("O conteúdo solicitado foi bloqueado por filtros de segurança. Use termos mais leves.");
     }
-    if (error.message?.includes("429")) {
+    if (msg.includes("429") || msg.includes("quota")) {
       throw new Error("Muitas solicitações. Aguarde um momento.");
     }
-    // Propagate generic errors
+    
     throw error;
   }
 };
 
 export const generateImagePromptFromTitle = async (title: string): Promise<string> => {
-  const apiKey = getApiKey();
-  
-  if (!apiKey) {
-    throw new Error("MISSING_API_KEY");
-  }
-
-  const ai = new GoogleGenAI({ apiKey });
+  // Use process.env.API_KEY directly as per strict guidelines
+  const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
   
   try {
     const prompt = `
@@ -137,9 +96,6 @@ export const generateImagePromptFromTitle = async (title: string): Promise<strin
     return response.text?.trim() || "";
   } catch (error: any) {
     console.error("Error generating prompt:", error);
-    if (error.message === "MISSING_API_KEY" || error.message?.includes("API Key") || error.message?.includes("API_KEY")) {
-      throw new Error("MISSING_API_KEY");
-    }
     return "";
   }
 };
