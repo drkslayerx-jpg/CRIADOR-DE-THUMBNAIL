@@ -6,7 +6,12 @@ export const generateBackgroundImage = async (
   stylePrompt: string,
   aspectRatio: string = "16:9"
 ): Promise<string> => {
-  // Use process.env.API_KEY directly as per strict guidelines
+  
+  // Verificação amigável para ajudar o usuário a configurar
+  if (!process.env.API_KEY) {
+    throw new Error("MISSING_KEY");
+  }
+
   const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
 
   // Optimized prompt to focus purely on visual composition
@@ -57,6 +62,8 @@ export const generateBackgroundImage = async (
 
   } catch (error: any) {
     console.error("Gemini Error:", error);
+    if (error.message === "MISSING_KEY") throw error;
+    
     if (error.message?.includes("SAFETY")) {
       throw new Error("O conteúdo solicitado foi bloqueado por filtros de segurança. Use termos mais leves.");
     }
@@ -68,7 +75,10 @@ export const generateBackgroundImage = async (
 };
 
 export const generateImagePromptFromTitle = async (title: string): Promise<string> => {
-  // Use process.env.API_KEY directly as per strict guidelines
+  if (!process.env.API_KEY) {
+    throw new Error("MISSING_KEY");
+  }
+  
   const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
   
   const prompt = `
@@ -91,6 +101,7 @@ export const generateImagePromptFromTitle = async (title: string): Promise<strin
     return response.text?.trim() || "";
   } catch (error: any) {
     console.error("Error generating prompt:", error);
+    if (error.message === "MISSING_KEY") throw error;
     return "";
   }
 };
