@@ -1,20 +1,19 @@
 import { GoogleGenAI } from "@google/genai";
 
-const apiKey = process.env.API_KEY || '';
-
-const getAIClient = () => new GoogleGenAI({ apiKey });
+const getAIClient = (apiKey: string) => new GoogleGenAI({ apiKey });
 
 export const generateBackgroundImage = async (
   title: string,
   description: string,
   stylePrompt: string,
-  aspectRatio: string = "16:9"
+  aspectRatio: string = "16:9",
+  apiKey: string
 ): Promise<string> => {
   if (!apiKey) {
-    throw new Error("Chave de API não configurada.");
+    throw new Error("Chave de API ausente. Por favor, insira sua chave na tela inicial.");
   }
 
-  const ai = getAIClient();
+  const ai = getAIClient(apiKey);
 
   // Optimized prompt to focus purely on visual composition
   const prompt = `
@@ -70,13 +69,16 @@ export const generateBackgroundImage = async (
     if (error.message?.includes("429")) {
       throw new Error("Muitas solicitações. Aguarde um momento.");
     }
+    if (error.message?.includes("API_KEY")) {
+      throw new Error("Chave de API inválida. Verifique suas credenciais.");
+    }
     throw error;
   }
 };
 
-export const generateImagePromptFromTitle = async (title: string): Promise<string> => {
+export const generateImagePromptFromTitle = async (title: string, apiKey: string): Promise<string> => {
   if (!apiKey) throw new Error("API Key missing");
-  const ai = getAIClient();
+  const ai = getAIClient(apiKey);
   
   const prompt = `
     Based on the YouTube Video Title: "${title}", write a detailed visual description for a thumbnail background image.

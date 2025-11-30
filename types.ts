@@ -54,6 +54,7 @@ export interface ThumbnailData {
   
   // Resolution / Format
   aspectRatio: string;
+  selectedResolutionId?: string;
 
   // Layout Controls
   textAlignment: 'left' | 'center' | 'right';
@@ -67,4 +68,5 @@ export interface ThumbnailData {
   selectedOverlayId: string;
   
   isGenerating: boolean;
+  apiKey?: string; // API Key for dynamic usage
 }
