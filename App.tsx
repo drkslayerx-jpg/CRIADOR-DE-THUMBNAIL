@@ -1,12 +1,14 @@
 // App.tsx
-import React, { useState, useCallback } from 'react';
-import { ControlPanel } from './components/ControlPanel';
-import { ThumbnailPreview } from './components/ThumbnailPreview';
-import { FONTS, PALETTES, STYLES, OVERLAY_EFFECTS, RESOLUTIONS } from './constants';
-import { ThumbnailData } from './types';
-import { SpeedInsights } from "@vercel/speed-insights/react"; // 
-import { generateBackgroundImage } from './services/geminiService';
-import { AlertCircle } from 'lucide-react';
+
+1  import React, { useState, useCallback } from 'react';
+2  import { ControlPanel } from './components/ControlPanel';
+3  import { ThumbnailPreview } from './components/ThumbnailPreview';
+4  import { FONTS, PALETTES, STYLES, OVERLAY_EFFECTS, RESOLUTIONS } from './constants';
+5  import { ThumbnailData } from './types';
+// LINHA 6: ADICIONE AQUI
+6  import { SpeedInsights } from "@vercel/speed-insights/react"; 
+7  import { generateBackgroundImage } from './services/geminiService';
+8  import { AlertCircle } from 'lucide-react';
 //o
 
 const DEFAULT_DATA: ThumbnailData = {
@@ -76,29 +78,31 @@ function App() {
   const selectedFont = FONTS.find((f) => f.id === data.selectedFontId) || FONTS[0];
 
   return (
-    <div className="flex flex-col md:flex-row h-screen bg-slate-950 text-white font-sans overflow-hidden selection:bg-red-500/30 selection:text-red-200">
-      <div className="flex-1 order-2 lg:order-1 h-[45%] lg:h-full w-full lg:w-auto flex-shrink-0 z-40">
-        {/* Control Panel */}
-        <div className="p-4 border-r border-gray-800 lg:order-1 h-full w-full lg:w-auto flex-shrink-0 z-40">
-          <ControlPanel
-            data={data}
-            palettes={PALETTES}
-            fonts={FONTS}
-            onUpdate={handleUpdate}
-            onGenerateImage={handleGenerateBackground}
-          />
-        </div>
+    <div className="flex flex-col lg:flex-row h-screen w-screen bg-slate-950 text-white font-sans overflow-hidden selection:bg-red-500/30 selection:text-red-200">
+      
+      {/* Control Panel */}
+      <div className="order-2 lg:order-1 h-[45%] lg:h-full w-full lg:w-auto flex-shrink-0 z-40">
+        <ControlPanel
+          data={data}
+          palettes={PALETTES}
+          fonts={FONTS}
+          onUpdate={handleUpdate}
+          onGenerateImage={handleGenerateBackground}
+        />
       </div>
 
       {/* Main Preview */}
-      <div className="lg:order-2 order-1 lg:flex-1 relative h-[55%] lg:h-full flex flex-col z-10 bg-slate-950">
+      <div className="order-1 lg:order-2 flex-1 relative h-[55%] lg:h-full flex flex-col z-10 bg-slate-950">
+        
         {/* Error Notification */}
         {error && (
-          <div className="absolute top-20 left-1/2 transform -translate-x-1/2 z-50 w-[90%] max-w-md bg-red-950/90 text-white px-4 py-3 rounded border border-red-500 mt-0.5">
+          <div className="absolute top-20 left-1/2 transform -translate-x-1/2 z-50 w-[90%] max-w-md bg-red-950/90 text-white px-4 py-3 rounded border border-red-500/50 flex items-start gap-3 shadow-2xl backdrop-blur-md animate-in slide-in-from-top-2">
             <AlertCircle className="w-5 h-5 shrink-0 text-red-500 mt-0.5" />
-            <h4 className="font-bold text-xs uppercase tracking-wide text-red-200 mb-1">Erro no Sistema</h4>
-            <p className="text-sm text-gray-300 leading-relaxed">{error}</p>
-            <button onClick={() => setError(null)} className="ml-2 text-gray-400 hover:text-white transition-colors">Fechar</button>
+            <div className="flex-1">
+              <h4 className="font-bold text-xs uppercase tracking-wide text-red-200 mb-1">Erro no Sistema</h4>
+              <p className="text-xs text-gray-300 leading-relaxed">{error}</p>
+            </div>
+            <button onClick={() => setError(null)} className="ml-2 text-gray-400 hover:text-white transition-colors">✕</button>
           </div>
         )}
 
@@ -107,8 +111,6 @@ function App() {
           selectedPalette={selectedPalette}
           selectedFont={selectedFont}
         />
-        
-        <SpeedInsights /> {/* <-- COLE AQUI */}
       </div>
     </div>
   );
