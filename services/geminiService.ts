@@ -7,7 +7,6 @@ export const generateBackgroundImage = async (
   aspectRatio: string = "16:9"
 ): Promise<string> => {
   
-  // Use process.env.API_KEY directly as per guidelines
   const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
 
   // Optimized prompt to focus purely on visual composition
@@ -70,22 +69,21 @@ export const generateBackgroundImage = async (
 };
 
 export const generateImagePromptFromTitle = async (title: string): Promise<string> => {
-  // Use process.env.API_KEY directly
-  const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
-  
-  const prompt = `
-    Based on the YouTube Video Title: "${title}", write a detailed visual description for a thumbnail background image.
-    
-    Focus on:
-    - Lighting and Atmosphere (e.g., dramatic, neon, sunny)
-    - Key Elements (e.g., characters, objects, environment)
-    - Emotion (e.g., scary, exciting, happy)
-    
-    Keep it concise (under 40 words) and optimized for an AI image generator. 
-    Output ONLY the description in English.
-  `;
-
   try {
+    const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
+    
+    const prompt = `
+      Based on the YouTube Video Title: "${title}", write a detailed visual description for a thumbnail background image.
+      
+      Focus on:
+      - Lighting and Atmosphere (e.g., dramatic, neon, sunny)
+      - Key Elements (e.g., characters, objects, environment)
+      - Emotion (e.g., scary, exciting, happy)
+      
+      Keep it concise (under 40 words) and optimized for an AI image generator. 
+      Output ONLY the description in English.
+    `;
+
     const response = await ai.models.generateContent({
       model: 'gemini-2.5-flash',
       contents: prompt,

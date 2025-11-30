@@ -72,6 +72,7 @@ function App() {
       setData((prev) => ({ ...prev, bgImage: imageBase64 }));
     } catch (err: any) {
       console.error("App Generate Error:", err);
+      // Pass the specific error message to state
       setError(err.message || "Erro desconhecido ao gerar imagem.");
     } finally {
       setData((prev) => ({ ...prev, isGenerating: false }));
@@ -100,24 +101,24 @@ function App() {
         
         {/* Error Notification Modal */}
         {error && (
-          <div className="absolute inset-0 z-[100] flex items-center justify-center bg-slate-950/80 backdrop-blur-sm p-4 animate-in fade-in duration-200">
-            <div className="bg-slate-900 text-white p-6 rounded-xl border border-red-500/30 shadow-2xl max-w-md w-full relative">
-              <div className="flex items-start gap-4">
-                <div className="p-3 bg-red-500/10 rounded-full shrink-0">
-                  <AlertCircle className="w-6 h-6 text-red-500" />
-                </div>
-                <div className="flex-1">
-                  <h4 className="font-bold text-lg uppercase tracking-wide text-white mb-2">Erro no Sistema</h4>
-                  <p className="text-sm text-slate-400 leading-relaxed mb-4">{error}</p>
-                  <button 
-                    onClick={() => setError(null)} 
-                    className="bg-slate-800 hover:bg-slate-700 text-white text-xs font-bold px-4 py-2 rounded-lg transition-colors uppercase"
-                  >
-                    Entendido
-                  </button>
+          <div className="absolute inset-0 z-[100] flex items-center justify-center bg-slate-950/90 backdrop-blur-md p-4 animate-in fade-in zoom-in-95 duration-200">
+              <div className="bg-slate-900 text-white p-6 rounded-xl border border-red-500/30 shadow-2xl max-w-md w-full relative">
+                <div className="flex items-start gap-4">
+                  <div className="p-3 bg-red-500/10 rounded-full shrink-0">
+                    <AlertCircle className="w-6 h-6 text-red-500" />
+                  </div>
+                  <div className="flex-1">
+                    <h4 className="font-bold text-lg uppercase tracking-wide text-white mb-2">Erro no Sistema</h4>
+                    <p className="text-sm text-slate-400 leading-relaxed mb-4">{error}</p>
+                    <button 
+                      onClick={() => setError(null)} 
+                      className="bg-slate-800 hover:bg-slate-700 text-white text-xs font-bold px-4 py-2 rounded-lg transition-colors uppercase"
+                    >
+                      Entendido
+                    </button>
+                  </div>
                 </div>
               </div>
-            </div>
           </div>
         )}
 
