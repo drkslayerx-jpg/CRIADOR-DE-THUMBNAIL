@@ -6,6 +6,7 @@ export const generateBackgroundImage = async (
   stylePrompt: string,
   aspectRatio: string = "16:9"
 ): Promise<string> => {
+  // Use process.env.API_KEY directly as per strict guidelines
   const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
 
   // Optimized prompt to focus purely on visual composition
@@ -67,6 +68,7 @@ export const generateBackgroundImage = async (
 };
 
 export const generateImagePromptFromTitle = async (title: string): Promise<string> => {
+  // Use process.env.API_KEY directly as per strict guidelines
   const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
   
   const prompt = `
