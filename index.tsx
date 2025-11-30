@@ -17,8 +17,8 @@ interface State {
   error: Error | null;
 }
 
-// Fix: Explicitly extend React.Component to ensure correct type inference for props and state
-class ErrorBoundary extends React.Component<Props, State> {
+// Fix: Explicitly extend Component to ensure correct type inference for props and state
+class ErrorBoundary extends Component<Props, State> {
   public state: State = {
     hasError: false,
     error: null
