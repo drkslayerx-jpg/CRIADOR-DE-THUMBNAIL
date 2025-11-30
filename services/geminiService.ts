@@ -9,17 +9,17 @@ const getApiKey = (): string => {
       return meta.env.VITE_API_KEY;
     }
   } catch (e) {
-    // ignore
+    // ignore error
   }
 
   // 2. Tenta ler do Process (Padrão Node/Legacy)
-  // O Polyfill no index.html garante que process.env exista para não travar
   if (typeof process !== 'undefined' && process.env) {
     if (process.env.API_KEY) return process.env.API_KEY;
     if (process.env.REACT_APP_API_KEY) return process.env.REACT_APP_API_KEY;
     if (process.env.VITE_API_KEY) return process.env.VITE_API_KEY;
   }
 
+  // Se chegou aqui, não achou nenhuma chave
   throw new Error("MISSING_KEY");
 };
 

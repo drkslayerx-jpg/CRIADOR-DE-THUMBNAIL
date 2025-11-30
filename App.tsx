@@ -82,7 +82,10 @@ function App() {
   const selectedPalette = PALETTES.find((p) => p.id === data.selectedPaletteId) || PALETTES[0];
   const selectedFont = FONTS.find((f) => f.id === data.selectedFontId) || FONTS[0];
 
-  const isMissingKeyError = error === "MISSING_KEY" || error?.toLowerCase().includes("api key") || error?.toLowerCase().includes("key not found");
+  // Detect specific key errors regardless of casing or specific wording
+  const isMissingKeyError = error === "MISSING_KEY" || 
+                            error?.toLowerCase().includes("api key") || 
+                            error?.toLowerCase().includes("key not found");
 
   return (
     <div className="flex flex-col lg:flex-row h-screen w-screen bg-slate-950 text-white font-sans overflow-hidden selection:bg-red-500/30 selection:text-red-200">
