@@ -76,31 +76,29 @@ function App() {
   const selectedFont = FONTS.find((f) => f.id === data.selectedFontId) || FONTS[0];
 
   return (
-    <div className="flex flex-col lg:flex-row h-screen w-screen bg-slate-950 text-white font-sans overflow-hidden selection:bg-red-500/30 selection:text-red-200">
-      
-      {/* Control Panel */}
-      <div className="order-2 lg:order-1 h-[45%] lg:h-full w-full lg:w-auto flex-shrink-0 z-40">
-        <ControlPanel
-          data={data}
-          palettes={PALETTES}
-          fonts={FONTS}
-          onUpdate={handleUpdate}
-          onGenerateImage={handleGenerateBackground}
-        />
+    <div className="flex flex-col md:flex-row h-screen bg-slate-950 text-white font-sans overflow-hidden selection:bg-red-500/30 selection:text-red-200">
+      <div className="flex-1 order-2 lg:order-1 h-[45%] lg:h-full w-full lg:w-auto flex-shrink-0 z-40">
+        {/* Control Panel */}
+        <div className="p-4 border-r border-gray-800 lg:order-1 h-full w-full lg:w-auto flex-shrink-0 z-40">
+          <ControlPanel
+            data={data}
+            palettes={PALETTES}
+            fonts={FONTS}
+            onUpdate={handleUpdate}
+            onGenerateImage={handleGenerateBackground}
+          />
+        </div>
       </div>
 
       {/* Main Preview */}
-      <div className="order-1 lg:order-2 flex-1 relative h-[55%] lg:h-full flex flex-col z-10 bg-slate-950">
-        
+      <div className="lg:order-2 order-1 lg:flex-1 relative h-[55%] lg:h-full flex flex-col z-10 bg-slate-950">
         {/* Error Notification */}
         {error && (
-          <div className="absolute top-20 left-1/2 transform -translate-x-1/2 z-50 w-[90%] max-w-md bg-red-950/90 text-white px-4 py-3 rounded border border-red-500/50 flex items-start gap-3 shadow-2xl backdrop-blur-md animate-in slide-in-from-top-2">
+          <div className="absolute top-20 left-1/2 transform -translate-x-1/2 z-50 w-[90%] max-w-md bg-red-950/90 text-white px-4 py-3 rounded border border-red-500 mt-0.5">
             <AlertCircle className="w-5 h-5 shrink-0 text-red-500 mt-0.5" />
-            <div className="flex-1">
-              <h4 className="font-bold text-xs uppercase tracking-wide text-red-200 mb-1">Erro no Sistema</h4>
-              <p className="text-xs text-gray-300 leading-relaxed">{error}</p>
-            </div>
-            <button onClick={() => setError(null)} className="ml-2 text-gray-400 hover:text-white transition-colors">✕</button>
+            <h4 className="font-bold text-xs uppercase tracking-wide text-red-200 mb-1">Erro no Sistema</h4>
+            <p className="text-sm text-gray-300 leading-relaxed">{error}</p>
+            <button onClick={() => setError(null)} className="ml-2 text-gray-400 hover:text-white transition-colors">Fechar</button>
           </div>
         )}
 
@@ -109,6 +107,8 @@ function App() {
           selectedPalette={selectedPalette}
           selectedFont={selectedFont}
         />
+        
+        <SpeedInsights /> {/* <-- COLE AQUI */}
       </div>
     </div>
   );
