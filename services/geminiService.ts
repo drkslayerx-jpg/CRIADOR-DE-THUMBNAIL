@@ -1,5 +1,31 @@
 import { GoogleGenAI, GenerateContentResponse } from "@google/genai";
 
+// Helper function to find the API Key in various environments (Vercel, Vite, CRA, Next)
+const getApiKey = (): string => {
+  // 1. Try React App standard (Most likely for Vercel/CRA)
+  if (typeof process !== 'undefined' && process.env && process.env.REACT_APP_API_KEY) {
+    return process.env.REACT_APP_API_KEY;
+  }
+  
+  // 2. Try Vite standard
+  if (typeof import.meta !== 'undefined' && (import.meta as any).env && (import.meta as any).env.VITE_API_KEY) {
+    return (import.meta as any).env.VITE_API_KEY;
+  }
+
+  // 3. Try Next.js public standard
+  if (typeof process !== 'undefined' && process.env && process.env.NEXT_PUBLIC_API_KEY) {
+    return process.env.NEXT_PUBLIC_API_KEY;
+  }
+
+  // 4. Try standard Node/Server key
+  if (typeof process !== 'undefined' && process.env && process.env.API_KEY) {
+    return process.env.API_KEY;
+  }
+
+  // If we are here, no key was found
+  throw new Error("MISSING_API_KEY");
+};
+
 export const generateBackgroundImage = async (
   title: string,
   description: string,
@@ -7,7 +33,14 @@ export const generateBackgroundImage = async (
   aspectRatio: string = "16:9"
 ): Promise<string> => {
   
-  const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
+  let apiKey: string;
+  try {
+    apiKey = getApiKey();
+  } catch (e) {
+    throw new Error("MISSING_API_KEY");
+  }
+
+  const ai = new GoogleGenAI({ apiKey });
 
   // Optimized prompt to focus purely on visual composition
   const prompt = `
@@ -58,6 +91,9 @@ export const generateBackgroundImage = async (
   } catch (error: any) {
     console.error("Gemini Error:", error);
     
+    if (error.message === "MISSING_API_KEY") {
+       throw error;
+    }
     if (error.message?.includes("SAFETY")) {
       throw new Error("O conteúdo solicitado foi bloqueado por filtros de segurança. Use termos mais leves.");
     }
@@ -70,7 +106,8 @@ export const generateBackgroundImage = async (
 
 export const generateImagePromptFromTitle = async (title: string): Promise<string> => {
   try {
-    const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
+    const apiKey = getApiKey();
+    const ai = new GoogleGenAI({ apiKey });
     
     const prompt = `
       Based on the YouTube Video Title: "${title}", write a detailed visual description for a thumbnail background image.
@@ -91,6 +128,7 @@ export const generateImagePromptFromTitle = async (title: string): Promise<strin
     return response.text?.trim() || "";
   } catch (error: any) {
     console.error("Error generating prompt:", error);
+    if (error.message === "MISSING_API_KEY") throw error;
     return "";
   }
 };
