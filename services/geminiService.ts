@@ -7,8 +7,14 @@ export const generateBackgroundImage = async (
   aspectRatio: string = "16:9"
 ): Promise<string> => {
   
-  // Initialize the client with the API key from the environment variable
-  const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
+  // According to guidelines, the API key must be obtained exclusively from process.env.API_KEY.
+  const apiKey = process.env.API_KEY;
+  
+  if (!apiKey) {
+    throw new Error("MISSING_API_KEY");
+  }
+
+  const ai = new GoogleGenAI({ apiKey });
 
   // Optimized prompt to focus purely on visual composition
   const prompt = `
@@ -59,6 +65,11 @@ export const generateBackgroundImage = async (
   } catch (error: any) {
     console.error("Gemini Error:", error);
     
+    // Check for standard Google SDK error regarding missing API Key
+    if (error.message?.includes("API Key") || error.message?.includes("API_KEY")) {
+      throw new Error("MISSING_API_KEY");
+    }
+
     if (error.message?.includes("SAFETY")) {
       throw new Error("O conteúdo solicitado foi bloqueado por filtros de segurança. Use termos mais leves.");
     }
@@ -71,8 +82,11 @@ export const generateBackgroundImage = async (
 };
 
 export const generateImagePromptFromTitle = async (title: string): Promise<string> => {
+  const apiKey = process.env.API_KEY;
+  if (!apiKey) throw new Error("MISSING_API_KEY");
+
   try {
-    const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
+    const ai = new GoogleGenAI({ apiKey });
     
     const prompt = `
       Based on the YouTube Video Title: "${title}", write a detailed visual description for a thumbnail background image.
@@ -93,6 +107,9 @@ export const generateImagePromptFromTitle = async (title: string): Promise<strin
     return response.text?.trim() || "";
   } catch (error: any) {
     console.error("Error generating prompt:", error);
+    if (error.message?.includes("API Key") || error.message?.includes("API_KEY")) {
+      throw new Error("MISSING_API_KEY");
+    }
     return "";
   }
 };
