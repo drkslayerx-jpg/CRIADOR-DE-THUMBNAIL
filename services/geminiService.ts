@@ -2,20 +2,22 @@ import { GoogleGenAI, GenerateContentResponse } from "@google/genai";
 
 // Helper para encontrar a chave em qualquer lugar (Vite, Vercel, React, Node)
 const getApiKey = (): string => {
-  // 1. Tenta ler do Vite (Padrão Moderno)
-  const meta = import.meta as any;
-  if (typeof meta !== 'undefined' && meta.env) {
-    if (meta.env.VITE_API_KEY) return meta.env.VITE_API_KEY;
-    if (meta.env.REACT_APP_API_KEY) return meta.env.REACT_APP_API_KEY;
-    if (meta.env.API_KEY) return meta.env.API_KEY;
+  // 1. Tenta ler do Vite (Padrão Moderno - VERCEL USA ESTE)
+  try {
+    // @ts-ignore
+    if (import.meta && import.meta.env && import.meta.env.VITE_API_KEY) {
+      return import.meta.env.VITE_API_KEY;
+    }
+  } catch (e) {
+    // ignore
   }
 
   // 2. Tenta ler do Process (Padrão Node/Legacy)
   // O Polyfill no index.html garante que process.env exista para não travar
   if (typeof process !== 'undefined' && process.env) {
     if (process.env.API_KEY) return process.env.API_KEY;
-    if (process.env.VITE_API_KEY) return process.env.VITE_API_KEY;
     if (process.env.REACT_APP_API_KEY) return process.env.REACT_APP_API_KEY;
+    if (process.env.VITE_API_KEY) return process.env.VITE_API_KEY;
   }
 
   throw new Error("MISSING_KEY");
@@ -86,7 +88,8 @@ export const generateBackgroundImage = async (
   } catch (error: any) {
     console.error("Gemini Error:", error);
     
-    if (error.message?.includes("API key") || error.status === 403) {
+    // Catch common "Key missing" errors from Google and convert to our standard
+    if (error.message?.toLowerCase().includes("api key") || error.status === 403) {
       throw new Error("MISSING_KEY");
     }
     
