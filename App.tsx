@@ -1,10 +1,15 @@
-import React, { useState, useCallback } from 'react';
-import { ControlPanel } from './components/ControlPanel';
-import { ThumbnailPreview } from './components/ThumbnailPreview';
-import { FONTS, PALETTES, STYLES, OVERLAY_EFFECTS, RESOLUTIONS } from './constants';
-import { ThumbnailData } from './types';
-import { generateBackgroundImage } from './services/geminiService';
-import { AlertCircle } from 'lucide-react';
+// App.tsx
+
+1  import React, { useState, useCallback } from 'react';
+2  import { ControlPanel } from './components/ControlPanel';
+3  import { ThumbnailPreview } from './components/ThumbnailPreview';
+4  import { FONTS, PALETTES, STYLES, OVERLAY_EFFECTS, RESOLUTIONS } from './constants';
+5  import { ThumbnailData } from './types';
+// LINHA 6: ADICIONE AQUI
+6  import { SpeedInsights } from "@vercel/speed-insights/react"; 
+7  import { generateBackgroundImage } from './services/geminiService';
+8  import { AlertCircle } from 'lucide-react';
+//o
 
 const DEFAULT_DATA: ThumbnailData = {
   title: 'A VOLTA DO REI',
