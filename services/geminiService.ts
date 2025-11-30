@@ -1,5 +1,26 @@
 import { GoogleGenAI, GenerateContentResponse } from "@google/genai";
 
+// Helper robusto para encontrar a API Key em qualquer ambiente (Vite, Next, Create React App)
+const getApiKey = (): string => {
+  // 1. Tenta VITE (Padrão para este projeto no Vercel)
+  // Usamos 'as any' para evitar erros de TS se os tipos do Vite não estiverem configurados
+  if (typeof import.meta !== 'undefined' && (import.meta as any).env?.VITE_API_KEY) {
+    return (import.meta as any).env.VITE_API_KEY;
+  }
+  
+  // 2. Tenta REACT_APP (Padrão antigo)
+  if (typeof process !== 'undefined' && process.env?.REACT_APP_API_KEY) {
+    return process.env.REACT_APP_API_KEY;
+  }
+
+  // 3. Tenta Padrão Node/Next (process.env.API_KEY)
+  if (typeof process !== 'undefined' && process.env?.API_KEY) {
+    return process.env.API_KEY;
+  }
+
+  return "";
+};
+
 export const generateBackgroundImage = async (
   title: string,
   description: string,
@@ -7,7 +28,14 @@ export const generateBackgroundImage = async (
   aspectRatio: string = "16:9"
 ): Promise<string> => {
   
-  const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
+  const apiKey = getApiKey();
+
+  if (!apiKey) {
+    // Lança um erro específico que o App.tsx vai reconhecer para mostrar a tela de ajuda
+    throw new Error("MISSING_KEY");
+  }
+
+  const ai = new GoogleGenAI({ apiKey });
 
   const prompt = `
     Create a stunning, high-quality YouTube thumbnail background image.
@@ -60,6 +88,14 @@ export const generateBackgroundImage = async (
     // Tratamento de erros específicos
     const msg = (error.message || "").toLowerCase();
     
+    if (msg.includes("missing_key")) {
+      throw error; // Repassa o erro de chave para o App tratar
+    }
+    
+    if (msg.includes("key") || msg.includes("api")) {
+       throw new Error("MISSING_KEY"); // Força o erro de chave se a API reclamar
+    }
+
     if (msg.includes("safety")) {
       throw new Error("O conteúdo solicitado foi bloqueado por filtros de segurança. Use termos mais leves.");
     }
@@ -72,7 +108,10 @@ export const generateBackgroundImage = async (
 };
 
 export const generateImagePromptFromTitle = async (title: string): Promise<string> => {
-  const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
+  const apiKey = getApiKey();
+  if (!apiKey) throw new Error("MISSING_KEY");
+
+  const ai = new GoogleGenAI({ apiKey });
   
   try {
     const prompt = `
@@ -94,6 +133,7 @@ export const generateImagePromptFromTitle = async (title: string): Promise<strin
     return response.text?.trim() || "";
   } catch (error: any) {
     console.error("Error generating prompt:", error);
+    if (error.message?.includes("KEY")) throw new Error("MISSING_KEY");
     return "";
   }
 };
