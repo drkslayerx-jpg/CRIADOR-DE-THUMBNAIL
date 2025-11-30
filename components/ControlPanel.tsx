@@ -29,7 +29,6 @@ interface ControlPanelProps {
   fonts: FontStyle[];
   onUpdate: (field: keyof ThumbnailData, value: any) => void;
   onGenerateImage: () => void;
-  apiKey: string;
 }
 
 const QUICK_TEXTS = ["GAMEPLAY", "AO VIVO", "REACT", "VS", "EPICO", "TUTORIAL", "24H", "DESAFIO"];
@@ -40,7 +39,6 @@ export const ControlPanel: React.FC<ControlPanelProps> = ({
   fonts,
   onUpdate,
   onGenerateImage,
-  apiKey,
 }) => {
   const [activeTab, setActiveTab] = useState<'editor' | 'studio'>('editor');
   const [isMagicLoading, setIsMagicLoading] = useState(false);
@@ -49,7 +47,7 @@ export const ControlPanel: React.FC<ControlPanelProps> = ({
     if (!data.title) return;
     setIsMagicLoading(true);
     try {
-      const prompt = await generateImagePromptFromTitle(data.title, apiKey);
+      const prompt = await generateImagePromptFromTitle(data.title);
       if (prompt) {
         onUpdate('description', prompt);
         setActiveTab('studio');

@@ -1,19 +1,12 @@
-import { GoogleGenAI } from "@google/genai";
-
-const getAIClient = (apiKey: string) => new GoogleGenAI({ apiKey });
+import { GoogleGenAI, GenerateContentResponse } from "@google/genai";
 
 export const generateBackgroundImage = async (
   title: string,
   description: string,
   stylePrompt: string,
-  aspectRatio: string = "16:9",
-  apiKey: string
+  aspectRatio: string = "16:9"
 ): Promise<string> => {
-  if (!apiKey) {
-    throw new Error("Chave de API ausente. Por favor, insira sua chave na tela inicial.");
-  }
-
-  const ai = getAIClient(apiKey);
+  const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
 
   // Optimized prompt to focus purely on visual composition
   const prompt = `
@@ -33,8 +26,8 @@ export const generateBackgroundImage = async (
   console.log("Generating with prompt:", prompt, "Ratio:", aspectRatio);
 
   try {
-    const response = await ai.models.generateContent({
-      model: 'gemini-2.5-flash-image', // Use flash-image for speed/efficiency
+    const response: GenerateContentResponse = await ai.models.generateContent({
+      model: 'gemini-2.5-flash-image',
       contents: [
         {
           parts: [
@@ -69,16 +62,12 @@ export const generateBackgroundImage = async (
     if (error.message?.includes("429")) {
       throw new Error("Muitas solicitações. Aguarde um momento.");
     }
-    if (error.message?.includes("API_KEY")) {
-      throw new Error("Chave de API inválida. Verifique suas credenciais.");
-    }
     throw error;
   }
 };
 
-export const generateImagePromptFromTitle = async (title: string, apiKey: string): Promise<string> => {
-  if (!apiKey) throw new Error("API Key missing");
-  const ai = getAIClient(apiKey);
+export const generateImagePromptFromTitle = async (title: string): Promise<string> => {
+  const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
   
   const prompt = `
     Based on the YouTube Video Title: "${title}", write a detailed visual description for a thumbnail background image.

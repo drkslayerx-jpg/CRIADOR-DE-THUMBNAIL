@@ -68,5 +68,4 @@ export interface ThumbnailData {
   selectedOverlayId: string;
   
   isGenerating: boolean;
-  apiKey?: string; // API Key for dynamic usage
 }
