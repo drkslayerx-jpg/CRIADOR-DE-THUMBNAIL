@@ -21,7 +21,8 @@ import {
   Move,
   MoveHorizontal,
   Ratio,
-  Upload
+  Upload,
+  Image as LucideImage
 } from 'lucide-react';
 
 interface ControlPanelProps {
@@ -130,13 +131,22 @@ export const ControlPanel: React.FC<ControlPanelProps> = ({
             <div className="space-y-4">
                <div className="group">
                   <label className="text-[9px] text-slate-500 font-bold uppercase tracking-widest mb-2 block group-focus-within:text-red-500 transition-colors">Texto Principal</label>
-                  <textarea
-                    rows={2}
-                    value={data.title}
-                    onChange={(e) => onUpdate('title', e.target.value)}
-                    placeholder="DIGITE AQUI"
-                    className="w-full bg-slate-900 border border-slate-800 rounded-xl px-4 py-3 text-white placeholder-slate-600 focus:border-red-600/50 focus:bg-slate-800 focus:ring-1 focus:ring-red-500/20 outline-none text-xl font-bold transition-all uppercase resize-none leading-tight"
-                  />
+                  <div className="flex gap-2">
+                    <textarea
+                      rows={2}
+                      value={data.title}
+                      onChange={(e) => onUpdate('title', e.target.value)}
+                      placeholder="DIGITE AQUI"
+                      className="w-full bg-slate-900 border border-slate-800 rounded-xl px-4 py-3 text-white placeholder-slate-600 focus:border-red-600/50 focus:bg-slate-800 focus:ring-1 focus:ring-red-500/20 outline-none text-xl font-bold transition-all uppercase resize-none leading-tight"
+                    />
+                    <button 
+                      onClick={() => onUpdate('title', '')}
+                      className="bg-slate-900 border border-slate-800 rounded-xl px-3 hover:bg-red-950 hover:border-red-900 text-slate-500 hover:text-red-500 transition-colors"
+                      title="Limpar Texto"
+                    >
+                      <span className="text-xl">×</span>
+                    </button>
+                  </div>
                </div>
 
                {/* Quick Tags */}
@@ -322,6 +332,129 @@ export const ControlPanel: React.FC<ControlPanelProps> = ({
                   {isMagicLoading ? <div className="animate-spin w-3 h-3 border-2 border-current border-t-transparent rounded-full"/> : <Wand2 className="w-3 h-3 group-hover:scale-110 transition-transform" />}
                   GERAR CENÁRIO COM IA BASEADO NO TÍTULO
                 </button>
+             </div>
+
+          </div>
+        )}
+
+        {/* --- TAB: STUDIO --- */}
+        {activeTab === 'studio' && (
+          <div className="space-y-8 animate-in fade-in slide-in-from-right-2 duration-300">
+             
+             {/* Upload Custom Image */}
+             <div 
+               className="group border border-dashed border-slate-800 bg-slate-900/30 rounded-xl p-4 text-center cursor-pointer hover:bg-slate-900 hover:border-slate-600 transition-all relative overflow-hidden"
+               onClick={() => fileInputRef.current?.click()}
+             >
+                <input 
+                  type="file" 
+                  ref={fileInputRef} 
+                  onChange={handleImageUpload} 
+                  accept="image/*" 
+                  className="hidden" 
+                />
+                <div className="absolute inset-0 bg-gradient-to-tr from-blue-500/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity"></div>
+                <Upload className="w-5 h-5 mx-auto text-slate-500 mb-2 group-hover:text-blue-400 group-hover:scale-110 transition-transform" />
+                <span className="text-[9px] font-bold uppercase tracking-widest text-slate-500 group-hover:text-slate-300">Upload Imagem Própria</span>
+             </div>
+
+             {/* Resolution Select */}
+             <div className="space-y-3">
+                <label className="text-[9px] text-slate-500 font-bold uppercase tracking-widest flex items-center gap-1"><Ratio className="w-3 h-3"/> Formato / Resolução</label>
+                <div className="grid grid-cols-4 gap-2">
+                   {RESOLUTIONS.map(res => (
+                      <button
+                        key={res.id}
+                        onClick={() => {
+                          onUpdate('aspectRatio', res.aspectRatio);
+                          onUpdate('selectedResolutionId', res.id);
+                        }}
+                        className={`flex flex-col items-center justify-center gap-1 py-3 rounded-xl border transition-all ${
+                           data.aspectRatio === res.aspectRatio
+                           ? 'bg-red-500/10 border-red-500 text-red-500 shadow-sm'
+                           : 'bg-slate-900 border-slate-800 text-slate-500 hover:border-slate-700 hover:text-slate-300'
+                        }`}
+                      >
+                         {res.icon}
+                         <span className="text-[8px] font-bold uppercase">{res.label.split(' ')[0]}</span>
+                      </button>
+                   ))}
+                </div>
+             </div>
+
+             {/* Prompt Input */}
+             <div className="space-y-3">
+                <label className="text-[9px] text-slate-500 font-bold uppercase tracking-widest flex items-center gap-1"><Sparkles className="w-3 h-3 text-yellow-500"/> Prompt Visual</label>
+                <textarea
+                  rows={4}
+                  value={data.description}
+                  onChange={(e) => onUpdate('description', e.target.value)}
+                  placeholder="Descreva o cenário de fundo (ex: Estádio de futebol futurista à noite com luzes neon azuis)"
+                  className="w-full bg-slate-900 border border-slate-800 rounded-xl px-4 py-3 text-sm text-slate-300 placeholder-slate-600 focus:border-yellow-500/50 focus:bg-slate-800 focus:ring-1 focus:ring-yellow-500/20 outline-none transition-all resize-none"
+                />
+             </div>
+
+             {/* Style Selector */}
+             <div className="space-y-3">
+                <label className="text-[9px] text-slate-500 font-bold uppercase tracking-widest">Estilo de Renderização</label>
+                <div className="grid grid-cols-2 gap-2">
+                   {STYLES.map((style) => (
+                      <button
+                        key={style.id}
+                        onClick={() => onUpdate('selectedStyleId', style.id)}
+                        className={`flex items-center gap-3 p-3 rounded-xl border text-left transition-all ${
+                           data.selectedStyleId === style.id
+                           ? 'bg-slate-800 border-slate-600 text-white ring-1 ring-slate-500'
+                           : 'bg-slate-900 border-slate-800 text-slate-500 hover:bg-slate-800 hover:border-slate-700'
+                        }`}
+                      >
+                         <span className="text-xl">{style.icon}</span>
+                         <span className="text-[9px] font-bold uppercase tracking-wide">{style.name}</span>
+                      </button>
+                   ))}
+                </div>
+             </div>
+
+             {/* Overlay Effects */}
+             <div className="space-y-3 pb-24">
+                <label className="text-[9px] text-slate-500 font-bold uppercase tracking-widest">Itens Especiais (FX)</label>
+                <div className="grid grid-cols-3 gap-2">
+                   {OVERLAY_EFFECTS.map((overlay) => (
+                      <button
+                        key={overlay.id}
+                        onClick={() => onUpdate('selectedOverlayId', overlay.id)}
+                        className={`flex flex-col items-center justify-center gap-2 py-3 rounded-xl border transition-all ${
+                           data.selectedOverlayId === overlay.id
+                           ? 'bg-slate-800 border-slate-500 text-white'
+                           : 'bg-slate-900 border-slate-800 text-slate-500 hover:text-slate-300'
+                        }`}
+                      >
+                         <div className="opacity-70">{overlay.icon}</div>
+                         <span className="text-[8px] font-bold uppercase">{overlay.name}</span>
+                      </button>
+                   ))}
+                </div>
+             </div>
+
+             {/* Generate Button Fixed Bottom */}
+             <div className="absolute bottom-0 left-0 right-0 p-5 bg-gradient-to-t from-slate-950 via-slate-950 to-transparent">
+               <button
+                 onClick={onGenerateImage}
+                 disabled={data.isGenerating}
+                 className="w-full bg-red-600 hover:bg-red-500 text-white font-black py-4 rounded-xl shadow-lg shadow-red-900/40 transform transition-all active:scale-[0.98] disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2 uppercase tracking-widest text-xs"
+               >
+                 {data.isGenerating ? (
+                   <>
+                     <div className="animate-spin w-4 h-4 border-2 border-white border-t-transparent rounded-full"/>
+                     PROCESSANDO...
+                   </>
+                 ) : (
+                   <>
+                     <LucideImage className="w-4 h-4" />
+                     RENDERIZAR FUNDO 4K
+                   </>
+                 )}
+               </button>
              </div>
 
           </div>
