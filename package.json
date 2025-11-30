@@ -8,14 +8,14 @@
     "build": "vite build",
     "preview": "vite preview"
   },
-  "dependencies": {
+  "dependencies": @vercel/speed-insights {
     "@google/genai": "^1.30.0",
     "lucide-react": "^0.555.0",
     "react-dom": "^19.2.0",
     "react": "^19.2.0",
     "@vercel/speed-insights": "^1.2.0"
   },
-  "devDependencies": {
+  "devDependencies": {@vercel/speed-insights 
     "@types/node": "^22.14.0",
     "@vitejs/plugin-react": "^5.0.0",
     "typescript": "~5.8.2",
