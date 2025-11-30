@@ -1,5 +1,29 @@
 import { GoogleGenAI, GenerateContentResponse } from "@google/genai";
 
+// Helper to resolve API Key from various build environments (Vite, CRA, Node)
+const getApiKey = (): string => {
+  let key = '';
+  
+  // 1. Try Vite standard (import.meta.env)
+  try {
+    // @ts-ignore
+    if (import.meta && import.meta.env) {
+      // @ts-ignore
+      key = import.meta.env.VITE_API_KEY || import.meta.env.API_KEY || '';
+    }
+  } catch (e) {}
+
+  // 2. Try Node/CRA standard (process.env)
+  if (!key && typeof process !== 'undefined' && process.env) {
+    key = process.env.API_KEY || 
+          process.env.REACT_APP_API_KEY || 
+          process.env.NEXT_PUBLIC_API_KEY || 
+          '';
+  }
+
+  return key;
+};
+
 export const generateBackgroundImage = async (
   title: string,
   description: string,
@@ -7,7 +31,13 @@ export const generateBackgroundImage = async (
   aspectRatio: string = "16:9"
 ): Promise<string> => {
   
-  const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
+  const apiKey = getApiKey();
+  
+  if (!apiKey) {
+    throw new Error("MISSING_API_KEY");
+  }
+
+  const ai = new GoogleGenAI({ apiKey });
 
   // Optimized prompt to focus purely on visual composition
   const prompt = `
@@ -58,7 +88,11 @@ export const generateBackgroundImage = async (
   } catch (error: any) {
     console.error("Gemini Error:", error);
     
-    // Check for standard Google SDK error regarding missing API Key
+    if (error.message === "MISSING_API_KEY") {
+      throw error;
+    }
+
+    // Check for standard Google SDK error regarding missing API Key inside the SDK
     if (error.message?.includes("API Key") || error.message?.includes("API_KEY")) {
       throw new Error("MISSING_API_KEY");
     }
@@ -75,7 +109,13 @@ export const generateBackgroundImage = async (
 };
 
 export const generateImagePromptFromTitle = async (title: string): Promise<string> => {
-  const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
+  const apiKey = getApiKey();
+  
+  if (!apiKey) {
+    throw new Error("MISSING_API_KEY");
+  }
+
+  const ai = new GoogleGenAI({ apiKey });
   
   try {
     const prompt = `
@@ -97,7 +137,7 @@ export const generateImagePromptFromTitle = async (title: string): Promise<strin
     return response.text?.trim() || "";
   } catch (error: any) {
     console.error("Error generating prompt:", error);
-    if (error.message?.includes("API Key") || error.message?.includes("API_KEY")) {
+    if (error.message === "MISSING_API_KEY" || error.message?.includes("API Key") || error.message?.includes("API_KEY")) {
       throw new Error("MISSING_API_KEY");
     }
     return "";
