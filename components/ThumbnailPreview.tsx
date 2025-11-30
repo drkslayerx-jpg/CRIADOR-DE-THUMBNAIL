@@ -1,24 +1,54 @@
-import React, { useState } from 'react';
+import React, { useState, useRef } from 'react';
 import { Palette, FontStyle, ThumbnailData } from '../types';
-import { Download, Eye, EyeOff, ImageOff, MonitorPlay, Loader2 } from 'lucide-react';
+import { Download, Eye, EyeOff, ImageOff, MonitorPlay, Loader2, Move } from 'lucide-react';
 import { OVERLAY_EFFECTS, RESOLUTIONS } from '../constants';
 
 interface ThumbnailPreviewProps {
   data: ThumbnailData;
   selectedPalette: Palette;
   selectedFont: FontStyle;
+  onUpdate: (field: keyof ThumbnailData, value: any) => void;
 }
 
 export const ThumbnailPreview: React.FC<ThumbnailPreviewProps> = ({
   data,
   selectedPalette,
   selectedFont,
+  onUpdate,
 }) => {
   const [showUiOverlay, setShowUiOverlay] = useState(false);
   const [isDownloading, setIsDownloading] = useState(false);
+  const [isDragging, setIsDragging] = useState(false);
   
+  const dragStartRef = useRef<{ x: number; y: number } | null>(null);
+  const initialOffsetRef = useRef<{ x: number; y: number } | null>(null);
+
   // Get current resolution config
   const currentRes = RESOLUTIONS.find(r => r.aspectRatio === data.aspectRatio) || RESOLUTIONS[0];
+
+  const handleMouseDown = (e: React.MouseEvent) => {
+    setIsDragging(true);
+    dragStartRef.current = { x: e.clientX, y: e.clientY };
+    initialOffsetRef.current = { x: data.xOffset, y: data.yOffset };
+  };
+
+  const handleMouseMove = (e: React.MouseEvent) => {
+    if (!isDragging || !dragStartRef.current || !initialOffsetRef.current) return;
+
+    // Calculate delta and update based on scale/zoom logic if needed. 
+    // For now, 1px mouse movement = 1px offset
+    const deltaX = e.clientX - dragStartRef.current.x;
+    const deltaY = e.clientY - dragStartRef.current.y;
+
+    onUpdate('xOffset', initialOffsetRef.current.x + deltaX);
+    onUpdate('yOffset', initialOffsetRef.current.y + deltaY);
+  };
+
+  const handleMouseUp = () => {
+    setIsDragging(false);
+    dragStartRef.current = null;
+    initialOffsetRef.current = null;
+  };
 
   const containerStyle: React.CSSProperties = {
     fontFamily: selectedFont.fontFamily,
@@ -30,6 +60,7 @@ export const ThumbnailPreview: React.FC<ThumbnailPreviewProps> = ({
     transformOrigin: 'center center',
     width: '100%',
     height: '100%',
+    cursor: isDragging ? 'grabbing' : 'grab',
   };
 
   const currentOverlay = OVERLAY_EFFECTS.find(o => o.id === data.selectedOverlayId);
@@ -169,7 +200,11 @@ export const ThumbnailPreview: React.FC<ThumbnailPreviewProps> = ({
   };
 
   return (
-    <div className="flex-1 flex flex-col bg-slate-950 relative overflow-hidden h-full">
+    <div className="flex-1 flex flex-col bg-slate-950 relative overflow-hidden h-full"
+      onMouseMove={handleMouseMove}
+      onMouseUp={handleMouseUp}
+      onMouseLeave={handleMouseUp}
+    >
       
       {/* Cinematic Background (Ambilight Effect) */}
       {data.bgImage && (
@@ -267,30 +302,44 @@ export const ThumbnailPreview: React.FC<ThumbnailPreviewProps> = ({
                ></div>
             )}
             
-            {/* LAYER 3: Content */}
-            <div className="absolute inset-0 p-[8%] flex flex-col z-20 pointer-events-none" style={containerStyle}>
+            {/* LAYER 3: Content (DRAGGABLE) */}
+            <div 
+              className="absolute inset-0 p-[8%] flex flex-col z-20" 
+              style={containerStyle}
+              onMouseDown={handleMouseDown}
+            >
               
-              {data.subtitle && (
-                <div 
-                  className="inline-block px-4 py-1.5 mb-3 transform -skew-x-6 shadow-2xl backdrop-blur-sm"
-                  style={{ backgroundColor: selectedPalette.colors.secondary }}
-                >
-                  <span className="block transform skew-x-6 text-white font-black uppercase tracking-[0.15em] text-lg lg:text-xl drop-shadow-md">
-                    {data.subtitle}
-                  </span>
+              <div className="group/text relative">
+                {/* Drag Indicator (Hover Only) */}
+                <div className="absolute -inset-4 border-2 border-dashed border-white/20 rounded-lg opacity-0 group-hover/text:opacity-100 transition-opacity pointer-events-none flex items-center justify-center">
+                    <div className="bg-black/50 text-white text-[9px] px-2 py-1 rounded font-mono uppercase tracking-widest backdrop-blur-sm">
+                       <Move className="w-3 h-3 inline mr-1"/>
+                       Arraste
+                    </div>
                 </div>
-              )}
 
-              <h1 
-                className="text-6xl lg:text-8xl font-black leading-[0.85] uppercase max-w-full break-words tracking-tighter filter drop-shadow-2xl"
-                style={{ 
-                  color: selectedPalette.colors.primary,
-                  WebkitTextStroke: '1px rgba(0,0,0,0.1)', // Subtle stroke for definition
-                  textShadow: `${selectedPalette.colors.textShadow}, 0 10px 40px rgba(0,0,0,0.8)`,
-                }}
-              >
-                {data.title || "TÍTULO AQUI"}
-              </h1>
+                {data.subtitle && (
+                  <div 
+                    className="inline-block px-4 py-1.5 mb-3 transform -skew-x-6 shadow-2xl backdrop-blur-sm"
+                    style={{ backgroundColor: selectedPalette.colors.secondary }}
+                  >
+                    <span className="block transform skew-x-6 text-white font-black uppercase tracking-[0.15em] text-lg lg:text-xl drop-shadow-md">
+                      {data.subtitle}
+                    </span>
+                  </div>
+                )}
+
+                <h1 
+                  className="text-6xl lg:text-8xl font-black leading-[0.85] uppercase max-w-full break-words tracking-tighter filter drop-shadow-2xl"
+                  style={{ 
+                    color: selectedPalette.colors.primary,
+                    WebkitTextStroke: '1px rgba(0,0,0,0.1)', // Subtle stroke for definition
+                    textShadow: `${selectedPalette.colors.textShadow}, 0 10px 40px rgba(0,0,0,0.8)`,
+                  }}
+                >
+                  {data.title || "TÍTULO AQUI"}
+                </h1>
+              </div>
             </div>
 
             {/* LAYER 4: YouTube UI Simulator - Only show on 16:9 for accuracy */}

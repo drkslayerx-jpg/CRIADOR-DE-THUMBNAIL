@@ -112,6 +112,7 @@ function App() {
           data={data}
           selectedPalette={selectedPalette}
           selectedFont={selectedFont}
+          onUpdate={handleUpdate}
         />
       </div>
     </div>

@@ -1,32 +1,12 @@
 import { GoogleGenAI, GenerateContentResponse } from "@google/genai";
 
-// Helper to safely get the API Key without crashing the browser
-const getApiKey = (): string | undefined => {
-  try {
-    // In some build environments process might not be defined at all
-    // causing a ReferenceError if accessed directly
-    if (typeof process !== 'undefined' && process.env) {
-      return process.env.API_KEY;
-    }
-  } catch (e) {
-    console.warn("Could not access process.env");
-  }
-  return undefined;
-};
-
 export const generateBackgroundImage = async (
   title: string,
   description: string,
   stylePrompt: string,
   aspectRatio: string = "16:9"
 ): Promise<string> => {
-  const apiKey = getApiKey();
-  
-  if (!apiKey) {
-    throw new Error("API Key não configurada. Configure a variável de ambiente API_KEY no Vercel.");
-  }
-
-  const ai = new GoogleGenAI({ apiKey });
+  const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
 
   // Optimized prompt to focus purely on visual composition
   const prompt = `
@@ -87,15 +67,7 @@ export const generateBackgroundImage = async (
 };
 
 export const generateImagePromptFromTitle = async (title: string): Promise<string> => {
-  const apiKey = getApiKey();
-
-  if (!apiKey) {
-    // Return empty string silently or throw specific error handled by UI
-    console.warn("API Key missing for magic prompt");
-    return "";
-  }
-
-  const ai = new GoogleGenAI({ apiKey });
+  const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
   
   const prompt = `
     Based on the YouTube Video Title: "${title}", write a detailed visual description for a thumbnail background image.

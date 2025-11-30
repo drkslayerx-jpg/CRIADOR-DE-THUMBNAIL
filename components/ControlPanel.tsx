@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useRef } from 'react';
 import { Palette, FontStyle, ThumbnailData } from '../types';
 import { STYLES, OVERLAY_EFFECTS, RESOLUTIONS } from '../constants';
 import { generateImagePromptFromTitle } from '../services/geminiService';
@@ -20,7 +20,8 @@ import {
   Maximize,
   Move,
   MoveHorizontal,
-  Ratio
+  Ratio,
+  Upload
 } from 'lucide-react';
 
 interface ControlPanelProps {
@@ -42,6 +43,7 @@ export const ControlPanel: React.FC<ControlPanelProps> = ({
 }) => {
   const [activeTab, setActiveTab] = useState<'editor' | 'studio'>('editor');
   const [isMagicLoading, setIsMagicLoading] = useState(false);
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
   const handleMagicPrompt = async () => {
     if (!data.title) return;
@@ -56,6 +58,17 @@ export const ControlPanel: React.FC<ControlPanelProps> = ({
       console.error("Magic prompt error", error);
     } finally {
       setIsMagicLoading(false);
+    }
+  };
+
+  const handleImageUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        onUpdate('bgImage', reader.result as string);
+      };
+      reader.readAsDataURL(file);
     }
   };
 
@@ -318,6 +331,27 @@ export const ControlPanel: React.FC<ControlPanelProps> = ({
         {activeTab === 'studio' && (
           <div className="space-y-8 animate-in fade-in slide-in-from-right-2 duration-300">
             
+             {/* Upload Option */}
+             <div className="space-y-3">
+               <label className="text-[9px] text-slate-500 font-bold uppercase tracking-widest flex items-center gap-1"><Upload className="w-3 h-3"/> Upload Imagem Própria</label>
+               <div 
+                 onClick={() => fileInputRef.current?.click()}
+                 className="group cursor-pointer border-2 border-dashed border-slate-800 rounded-xl p-6 flex flex-col items-center justify-center gap-2 hover:border-red-500/50 hover:bg-slate-900 transition-all"
+               >
+                 <div className="p-3 bg-slate-900 rounded-full group-hover:bg-slate-800 transition-colors">
+                   <Upload className="w-5 h-5 text-slate-400 group-hover:text-red-500" />
+                 </div>
+                 <span className="text-[10px] font-bold text-slate-400 group-hover:text-slate-200">CLIQUE PARA CARREGAR</span>
+                 <input 
+                   type="file" 
+                   ref={fileInputRef} 
+                   onChange={handleImageUpload} 
+                   accept="image/*" 
+                   className="hidden" 
+                 />
+               </div>
+             </div>
+
             {/* Prompt Box */}
             <div className="space-y-3">
                <label className="text-[9px] text-slate-500 font-bold uppercase tracking-widest flex items-center gap-1"><Zap className="w-3 h-3 text-yellow-500"/> Prompt Visual</label>
