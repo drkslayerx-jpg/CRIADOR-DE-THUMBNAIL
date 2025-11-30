@@ -2,21 +2,23 @@ import { GoogleGenAI, GenerateContentResponse } from "@google/genai";
 
 // Helper para encontrar a chave em qualquer lugar (Vite, Vercel, React, Node)
 const getApiKey = (): string => {
-  // 1. Tenta ler do Vite (Padrão Moderno - VERCEL USA ESTE)
+  // 1. Tenta ler do Vite (Padrão Moderno - VERCEL USA ESTE com import.meta.env)
   try {
-    const meta = import.meta as any;
-    if (meta && meta.env && meta.env.VITE_API_KEY) {
-      return meta.env.VITE_API_KEY;
+    // Usando cast para any para evitar erros de tipagem do TS se o types não estiver configurado
+    const metaEnv = (import.meta as any).env;
+    if (metaEnv) {
+        if (metaEnv.VITE_API_KEY) return metaEnv.VITE_API_KEY;
+        if (metaEnv.API_KEY) return metaEnv.API_KEY;
     }
   } catch (e) {
     // ignore error
   }
 
-  // 2. Tenta ler do Process (Padrão Node/Legacy)
+  // 2. Tenta ler do Process (Padrão Node/Legacy/CreateReactApp)
   if (typeof process !== 'undefined' && process.env) {
-    if (process.env.API_KEY) return process.env.API_KEY;
-    if (process.env.REACT_APP_API_KEY) return process.env.REACT_APP_API_KEY;
     if (process.env.VITE_API_KEY) return process.env.VITE_API_KEY;
+    if (process.env.REACT_APP_API_KEY) return process.env.REACT_APP_API_KEY;
+    if (process.env.API_KEY) return process.env.API_KEY;
   }
 
   // Se chegou aqui, não achou nenhuma chave
