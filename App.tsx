@@ -1,3 +1,4 @@
+
 // App.tsx
 
 import React, { useState, useCallback } from 'react';
@@ -128,7 +129,7 @@ function App() {
                     <li className="pl-2">Acesse o painel do seu projeto na <strong className="text-white">Vercel</strong>.</li>
                     <li className="pl-2">Vá em <strong className="text-white">Settings → Environment Variables</strong>.</li>
                     <li className="pl-2">Adicione a variável de ambiente:
-                        <div className="mt-2 bg-black border border-slate-800 rounded p-2 grid grid-cols-[40px_1fr] gap-2">
+                        <div className="mt-2 bg-black border border-slate-800 rounded p-2 grid grid-cols-[80px_1fr] gap-2">
                            <span className="text-slate-500">Key:</span>
                            <code className="text-red-400 font-bold select-all">VITE_API_KEY</code>
                            <span className="text-slate-500">Value:</span>

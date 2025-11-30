@@ -7,14 +7,7 @@ export const generateBackgroundImage = async (
   aspectRatio: string = "16:9"
 ): Promise<string> => {
   
-  // According to guidelines, the API key must be obtained exclusively from process.env.API_KEY.
-  const apiKey = process.env.API_KEY;
-  
-  if (!apiKey) {
-    throw new Error("MISSING_API_KEY");
-  }
-
-  const ai = new GoogleGenAI({ apiKey });
+  const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
 
   // Optimized prompt to focus purely on visual composition
   const prompt = `
@@ -82,12 +75,9 @@ export const generateBackgroundImage = async (
 };
 
 export const generateImagePromptFromTitle = async (title: string): Promise<string> => {
-  const apiKey = process.env.API_KEY;
-  if (!apiKey) throw new Error("MISSING_API_KEY");
-
+  const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
+  
   try {
-    const ai = new GoogleGenAI({ apiKey });
-    
     const prompt = `
       Based on the YouTube Video Title: "${title}", write a detailed visual description for a thumbnail background image.
       
