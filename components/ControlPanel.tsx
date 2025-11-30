@@ -22,7 +22,8 @@ import {
   MoveHorizontal,
   Ratio,
   Upload,
-  Image as LucideImage
+  Image as LucideImage,
+  Pipette
 } from 'lucide-react';
 
 interface ControlPanelProps {
@@ -71,6 +72,17 @@ export const ControlPanel: React.FC<ControlPanelProps> = ({
       };
       reader.readAsDataURL(file);
     }
+  };
+
+  const handlePaletteSelect = (palette: Palette) => {
+    onUpdate('selectedPaletteId', palette.id);
+    // Batch update individual colors from palette
+    onUpdate('titleColor', palette.colors.primary);
+    onUpdate('subtitleColor', palette.colors.secondary);
+    
+    // Extract shadow color approximate or default to black/primary shadow logic
+    // For simplicity, we keep black or use textShadow from palette if parsable
+    onUpdate('shadowColor', '#000000'); 
   };
 
   return (
@@ -174,7 +186,110 @@ export const ControlPanel: React.FC<ControlPanelProps> = ({
                </div>
             </div>
 
-            {/* Layout Tools - Compact Toolbar Style */}
+            {/* Typography Grid */}
+            <div className="space-y-3">
+               <label className="text-[9px] text-slate-500 font-bold uppercase tracking-widest flex items-center gap-1"><Type className="w-3 h-3"/> Fontes</label>
+               <div className="grid grid-cols-2 gap-2">
+                  {fonts.map((font) => (
+                    <button
+                      key={font.id}
+                      onClick={() => onUpdate('selectedFontId', font.id)}
+                      className={`h-12 relative rounded-lg border transition-all overflow-hidden group ${
+                         data.selectedFontId === font.id
+                         ? 'bg-white text-black border-white shadow-md'
+                         : 'bg-slate-900 text-slate-400 border-slate-800 hover:border-slate-600 hover:text-white'
+                      }`}
+                    >
+                      <span 
+                        className="absolute inset-0 flex items-center justify-center text-lg leading-none pt-1" 
+                        style={{ fontFamily: font.fontFamily }}
+                      >
+                        {font.name}
+                      </span>
+                    </button>
+                  ))}
+               </div>
+            </div>
+
+            {/* Custom Colors Section */}
+            <div className="space-y-4">
+                <div className="flex items-center justify-between">
+                   <label className="text-[9px] text-slate-500 font-bold uppercase tracking-widest flex items-center gap-1"><Pipette className="w-3 h-3"/> Cores Personalizadas</label>
+                </div>
+                
+                <div className="flex gap-3">
+                   <div className="flex-1">
+                      <label className="text-[8px] text-slate-400 uppercase font-bold mb-1 block">Título</label>
+                      <div className="h-10 w-full rounded-lg border border-slate-800 bg-slate-900 relative overflow-hidden flex items-center px-2 gap-2 focus-within:border-slate-600">
+                         <input 
+                           type="color" 
+                           value={data.titleColor}
+                           onChange={(e) => {
+                             onUpdate('titleColor', e.target.value);
+                             onUpdate('selectedPaletteId', ''); // Deselect preset
+                           }}
+                           className="w-6 h-6 rounded border-none p-0 cursor-pointer bg-transparent"
+                         />
+                         <span className="text-[10px] font-mono text-slate-300 uppercase">{data.titleColor}</span>
+                      </div>
+                   </div>
+                   
+                   <div className="flex-1">
+                      <label className="text-[8px] text-slate-400 uppercase font-bold mb-1 block">Subtítulo</label>
+                      <div className="h-10 w-full rounded-lg border border-slate-800 bg-slate-900 relative overflow-hidden flex items-center px-2 gap-2 focus-within:border-slate-600">
+                         <input 
+                           type="color" 
+                           value={data.subtitleColor}
+                           onChange={(e) => {
+                             onUpdate('subtitleColor', e.target.value);
+                             onUpdate('selectedPaletteId', ''); // Deselect preset
+                           }}
+                           className="w-6 h-6 rounded border-none p-0 cursor-pointer bg-transparent"
+                         />
+                         <span className="text-[10px] font-mono text-slate-300 uppercase">{data.subtitleColor}</span>
+                      </div>
+                   </div>
+                   
+                   <div className="flex-1">
+                      <label className="text-[8px] text-slate-400 uppercase font-bold mb-1 block">Sombra</label>
+                      <div className="h-10 w-full rounded-lg border border-slate-800 bg-slate-900 relative overflow-hidden flex items-center px-2 gap-2 focus-within:border-slate-600">
+                         <input 
+                           type="color" 
+                           value={data.shadowColor}
+                           onChange={(e) => onUpdate('shadowColor', e.target.value)}
+                           className="w-6 h-6 rounded border-none p-0 cursor-pointer bg-transparent"
+                         />
+                         <span className="text-[10px] font-mono text-slate-300 uppercase">{data.shadowColor}</span>
+                      </div>
+                   </div>
+                </div>
+
+                {/* Quick Presets */}
+                <div className="space-y-2 pt-2">
+                   <label className="text-[8px] text-slate-600 uppercase font-bold">Estilos Rápidos (Presets)</label>
+                   <div className="grid grid-cols-4 gap-2">
+                      {palettes.map((palette) => (
+                        <button
+                          key={palette.id}
+                          onClick={() => handlePaletteSelect(palette)}
+                          className={`h-8 rounded-md border transition-all relative overflow-hidden ${
+                             data.selectedPaletteId === palette.id
+                             ? 'border-white ring-1 ring-white'
+                             : 'border-transparent opacity-60 hover:opacity-100 hover:border-slate-600'
+                          }`}
+                          title={palette.name}
+                        >
+                          <div className="absolute inset-0 flex">
+                            <div className="flex-1" style={{ backgroundColor: palette.colors.primary }}></div>
+                            <div className="flex-1" style={{ backgroundColor: palette.colors.secondary }}></div>
+                          </div>
+                        </button>
+                      ))}
+                   </div>
+                </div>
+            </div>
+
+            {/* Layout Tools */}
             <div className="bg-slate-900/50 border border-slate-800 rounded-xl p-4 space-y-4">
               <div className="flex items-center justify-between">
                 <label className="text-[9px] text-slate-500 font-bold uppercase tracking-widest flex items-center gap-1"><Layout className="w-3 h-3"/> Layout Geral</label>
@@ -271,55 +386,6 @@ export const ControlPanel: React.FC<ControlPanelProps> = ({
                    />
                  </div>
               </div>
-            </div>
-
-            {/* Typography Grid */}
-            <div className="space-y-3">
-               <label className="text-[9px] text-slate-500 font-bold uppercase tracking-widest flex items-center gap-1"><Type className="w-3 h-3"/> Fontes</label>
-               <div className="grid grid-cols-2 gap-2">
-                  {fonts.map((font) => (
-                    <button
-                      key={font.id}
-                      onClick={() => onUpdate('selectedFontId', font.id)}
-                      className={`h-12 relative rounded-lg border transition-all overflow-hidden group ${
-                         data.selectedFontId === font.id
-                         ? 'bg-white text-black border-white shadow-md'
-                         : 'bg-slate-900 text-slate-400 border-slate-800 hover:border-slate-600 hover:text-white'
-                      }`}
-                    >
-                      <span 
-                        className="absolute inset-0 flex items-center justify-center text-lg leading-none pt-1" 
-                        style={{ fontFamily: font.fontFamily }}
-                      >
-                        {font.name}
-                      </span>
-                    </button>
-                  ))}
-               </div>
-            </div>
-
-            {/* Color Palettes */}
-            <div className="space-y-3 pb-4">
-                <label className="text-[9px] text-slate-500 font-bold uppercase tracking-widest flex items-center gap-1"><PaletteIcon className="w-3 h-3"/> Paleta de Cores</label>
-                <div className="space-y-2">
-                   {palettes.map((palette) => (
-                     <button
-                       key={palette.id}
-                       onClick={() => onUpdate('selectedPaletteId', palette.id)}
-                       className={`w-full h-10 flex items-stretch rounded-lg border overflow-hidden transition-all ${
-                          data.selectedPaletteId === palette.id
-                          ? 'border-red-500 shadow-[0_0_15px_rgba(220,38,38,0.2)] scale-[1.01]'
-                          : 'border-transparent opacity-70 hover:opacity-100 hover:border-slate-700'
-                       }`}
-                     >
-                       <div className="flex-[2] bg-[#222] flex items-center px-3" style={{ backgroundColor: palette.colors.primary }}>
-                          <span className="text-[8px] font-black uppercase text-black/50 tracking-widest">{palette.name}</span>
-                       </div>
-                       <div className="flex-1" style={{ backgroundColor: palette.colors.secondary }}></div>
-                       <div className="flex-1" style={{ backgroundColor: palette.colors.background }}></div>
-                     </button>
-                   ))}
-                </div>
             </div>
             
              {/* Magic Action for Transition */}

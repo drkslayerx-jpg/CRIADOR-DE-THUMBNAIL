@@ -143,14 +143,14 @@ export const ThumbnailPreview: React.FC<ThumbnailPreviewProps> = ({
       if (data.textVerticalAlignment === 'bottom') drawY = yBound;
 
       // Shadow
-      ctx.shadowColor = selectedPalette.colors.secondary;
+      ctx.shadowColor = data.shadowColor || selectedPalette.colors.secondary;
       ctx.shadowBlur = 10;
       ctx.shadowOffsetX = 0;
       ctx.shadowOffsetY = 10;
 
       // Draw Title
       if (data.title) {
-        ctx.fillStyle = selectedPalette.colors.primary;
+        ctx.fillStyle = data.titleColor || selectedPalette.colors.primary;
         // Stroke
         ctx.lineWidth = canvas.height * 0.005;
         ctx.strokeStyle = "rgba(0,0,0,0.3)";
@@ -168,7 +168,7 @@ export const ThumbnailPreview: React.FC<ThumbnailPreviewProps> = ({
          const pad = fontSize * 0.2;
          const badgeHeight = fontSize * 0.5;
          
-         ctx.fillStyle = selectedPalette.colors.secondary;
+         ctx.fillStyle = data.subtitleColor || selectedPalette.colors.secondary;
          ctx.shadowBlur = 0;
          ctx.shadowOffsetX = 0;
          ctx.shadowOffsetY = 0;
@@ -321,7 +321,7 @@ export const ThumbnailPreview: React.FC<ThumbnailPreviewProps> = ({
                 {data.subtitle && (
                   <div 
                     className="inline-block px-4 py-1.5 mb-3 transform -skew-x-6 shadow-2xl backdrop-blur-sm"
-                    style={{ backgroundColor: selectedPalette.colors.secondary }}
+                    style={{ backgroundColor: data.subtitleColor || selectedPalette.colors.secondary }}
                   >
                     <span className="block transform skew-x-6 text-white font-black uppercase tracking-[0.15em] text-lg lg:text-xl drop-shadow-md">
                       {data.subtitle}
@@ -332,9 +332,9 @@ export const ThumbnailPreview: React.FC<ThumbnailPreviewProps> = ({
                 <h1 
                   className="text-6xl lg:text-8xl font-black leading-[0.85] uppercase max-w-full break-words tracking-tighter filter drop-shadow-2xl"
                   style={{ 
-                    color: selectedPalette.colors.primary,
+                    color: data.titleColor || selectedPalette.colors.primary,
                     WebkitTextStroke: '1px rgba(0,0,0,0.1)', // Subtle stroke for definition
-                    textShadow: `${selectedPalette.colors.textShadow}, 0 10px 40px rgba(0,0,0,0.8)`,
+                    textShadow: `${data.shadowColor || selectedPalette.colors.textShadow}, 0 10px 40px rgba(0,0,0,0.8)`,
                   }}
                 >
                   {data.title || "TÍTULO AQUI"}

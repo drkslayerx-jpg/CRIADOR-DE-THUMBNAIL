@@ -8,14 +8,21 @@ import { ThumbnailData } from './types';
 import { generateBackgroundImage } from './services/geminiService';
 import { AlertCircle, ServerCog, Copy } from 'lucide-react';
 
+const DEFAULT_PALETTE = PALETTES[4]; // Candy Pop as default example
+
 const DEFAULT_DATA: ThumbnailData = {
   title: 'A VOLTA DO REI',
   subtitle: 'JOGABILIDADE EPICA',
   description: '',
   bgImage: null,
-  selectedPaletteId: PALETTES[0].id,
+  selectedPaletteId: DEFAULT_PALETTE.id,
   selectedFontId: FONTS[1].id,
   selectedStyleId: STYLES[4].id,
+  
+  // Initialize colors explicitly
+  titleColor: DEFAULT_PALETTE.colors.primary,
+  subtitleColor: DEFAULT_PALETTE.colors.secondary,
+  shadowColor: '#000000', // Default shadow base
   
   // Default to YouTube Standard
   aspectRatio: '16:9',

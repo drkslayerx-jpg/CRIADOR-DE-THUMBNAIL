@@ -48,9 +48,14 @@ export interface ThumbnailData {
   subtitle: string;
   description: string;
   bgImage: string | null;
-  selectedPaletteId: string;
+  selectedPaletteId: string; // Kept for reference/UI highlighting
   selectedFontId: string;
   selectedStyleId: string;
+  
+  // Custom Colors (Separated)
+  titleColor: string;
+  subtitleColor: string;
+  shadowColor: string;
   
   // Resolution / Format
   aspectRatio: string;
@@ -68,4 +73,5 @@ export interface ThumbnailData {
   selectedOverlayId: string;
   
   isGenerating: boolean;
+  apiKey?: string; // Optional local handling
 }
