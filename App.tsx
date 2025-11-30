@@ -65,7 +65,12 @@ function App() {
       setData((prev) => ({ ...prev, bgImage: imageBase64 }));
     } catch (err: any) {
       console.error("App Generate Error:", err);
-      setError(err.message || "Erro desconhecido ao gerar imagem.");
+      // Friendly message for missing API Key
+      if (err.message && err.message.includes("API Key")) {
+         setError("Chave de API não encontrada. Se você está no Vercel, adicione a variável de ambiente 'API_KEY' nas configurações do projeto.");
+      } else {
+         setError(err.message || "Erro desconhecido ao gerar imagem.");
+      }
     } finally {
       setData((prev) => ({ ...prev, isGenerating: false }));
     }
