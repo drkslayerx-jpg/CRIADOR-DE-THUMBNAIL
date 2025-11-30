@@ -6,7 +6,7 @@ import { ThumbnailPreview } from './components/ThumbnailPreview';
 import { FONTS, PALETTES, STYLES } from './constants';
 import { ThumbnailData } from './types';
 import { generateBackgroundImage } from './services/geminiService';
-import { AlertCircle, ServerCog, Copy } from 'lucide-react';
+import { AlertCircle, ServerCog, Copy, Lock, ShieldAlert } from 'lucide-react';
 
 const DEFAULT_PALETTE = PALETTES[4]; // Candy Pop as default example
 
@@ -98,39 +98,92 @@ function App() {
       {/* Main Preview */}
       <div className="order-1 lg:order-2 flex-1 relative h-[55%] lg:h-full flex flex-col z-10 bg-slate-950">
         
-        {/* Error Notification */}
+        {/* Error Notification Modal */}
         {error && (
-          <div className="absolute top-20 left-1/2 transform -translate-x-1/2 z-50 w-[95%] max-w-lg shadow-2xl animate-in slide-in-from-top-4">
+          <div className="absolute inset-0 z-[100] flex items-center justify-center bg-slate-950/80 backdrop-blur-sm p-4 animate-in fade-in duration-200">
             {error === "MISSING_KEY" ? (
-              <div className="bg-slate-900 border border-red-500/50 rounded-xl overflow-hidden">
-                <div className="bg-red-900/20 px-4 py-3 border-b border-red-500/20 flex items-center gap-2">
-                   <ServerCog className="w-5 h-5 text-red-500" />
-                   <h3 className="font-bold text-red-100 uppercase tracking-wide text-sm">Configuração Necessária (Vercel)</h3>
-                   <button onClick={() => setError(null)} className="ml-auto text-gray-400 hover:text-white">✕</button>
+              <div className="bg-slate-900 w-full max-w-lg rounded-2xl border border-red-500/30 shadow-2xl shadow-red-900/20 overflow-hidden transform scale-100 transition-all">
+                
+                {/* Header */}
+                <div className="bg-gradient-to-r from-red-950 to-slate-900 px-6 py-5 border-b border-red-500/20 flex items-center gap-4">
+                   <div className="p-3 bg-red-500/10 rounded-full">
+                      <ServerCog className="w-6 h-6 text-red-500 animate-pulse" />
+                   </div>
+                   <div>
+                      <h3 className="font-black text-white uppercase tracking-wider text-lg">Configuração Pendente</h3>
+                      <p className="text-red-300 text-xs font-mono mt-0.5">SERVIDOR VERCEL NÃO AUTENTICADO</p>
+                   </div>
                 </div>
-                <div className="p-5 text-sm text-slate-300 space-y-3">
-                   <p>Para usar a IA, você precisa configurar sua chave no Vercel:</p>
-                   <ol className="list-decimal pl-5 space-y-1 text-slate-400 marker:text-red-500">
-                     <li>Vá no painel do seu projeto na <strong>Vercel</strong>.</li>
-                     <li>Clique em <strong>Settings</strong> {'>'} <strong>Environment Variables</strong>.</li>
-                     <li>Adicione uma nova variável:
-                        <div className="mt-2 bg-black/50 p-2 rounded border border-white/10 font-mono text-xs flex justify-between items-center group">
-                          <span>Key: <span className="text-red-400">API_KEY</span></span>
-                          <span className="text-emerald-500">Value: Sua Chave Gemini</span>
+
+                {/* Body */}
+                <div className="p-6 space-y-6">
+                   <div className="flex gap-3 bg-red-500/5 p-4 rounded-lg border border-red-500/10">
+                      <ShieldAlert className="w-5 h-5 text-red-400 shrink-0 mt-0.5" />
+                      <p className="text-sm text-slate-300 leading-relaxed">
+                        A Inteligência Artificial precisa ser ativada no painel do servidor para funcionar. Siga os passos abaixo:
+                      </p>
+                   </div>
+
+                   <ol className="space-y-4">
+                     <li className="flex gap-3 items-start group">
+                        <span className="flex items-center justify-center w-6 h-6 rounded bg-slate-800 text-slate-400 text-xs font-bold shrink-0 border border-slate-700 group-hover:border-red-500 group-hover:text-red-500 transition-colors">1</span>
+                        <span className="text-sm text-slate-400">Acesse o painel do seu projeto na <strong>Vercel</strong>.</span>
+                     </li>
+                     <li className="flex gap-3 items-start group">
+                        <span className="flex items-center justify-center w-6 h-6 rounded bg-slate-800 text-slate-400 text-xs font-bold shrink-0 border border-slate-700 group-hover:border-red-500 group-hover:text-red-500 transition-colors">2</span>
+                        <span className="text-sm text-slate-400">Vá em <strong>Settings</strong> ➔ <strong>Environment Variables</strong>.</span>
+                     </li>
+                     <li className="flex gap-3 items-start group">
+                        <span className="flex items-center justify-center w-6 h-6 rounded bg-slate-800 text-slate-400 text-xs font-bold shrink-0 border border-slate-700 group-hover:border-red-500 group-hover:text-red-500 transition-colors">3</span>
+                        <div className="flex-1 space-y-2">
+                           <span className="text-sm text-slate-400">Adicione a variável de ambiente:</span>
+                           <div className="bg-black p-3 rounded-lg border border-slate-700 font-mono text-xs flex flex-col gap-1">
+                              <div className="flex justify-between">
+                                <span className="text-slate-500">Key:</span>
+                                <span className="text-red-400 font-bold">API_KEY</span>
+                              </div>
+                              <div className="flex justify-between border-t border-white/5 pt-1 mt-1">
+                                <span className="text-slate-500">Value:</span>
+                                <span className="text-emerald-500 truncate max-w-[150px]">Sua Chave Gemini...</span>
+                              </div>
+                           </div>
                         </div>
                      </li>
-                     <li>Salve e faça um <strong>Redeploy</strong>.</li>
+                     <li className="flex gap-3 items-start group">
+                        <span className="flex items-center justify-center w-6 h-6 rounded bg-slate-800 text-slate-400 text-xs font-bold shrink-0 border border-slate-700 group-hover:border-red-500 group-hover:text-red-500 transition-colors">4</span>
+                        <span className="text-sm text-slate-400">Faça um <strong>Redeploy</strong> para aplicar.</span>
+                     </li>
                    </ol>
+                </div>
+                
+                {/* Footer */}
+                <div className="bg-slate-950 px-6 py-4 flex justify-between items-center border-t border-slate-800">
+                   <span className="text-[10px] text-slate-600 uppercase tracking-widest font-bold">SC SYSTEM ADMIN</span>
+                   <button 
+                     onClick={() => setError(null)} 
+                     className="text-xs font-bold text-slate-400 hover:text-white transition-colors uppercase tracking-wide px-4 py-2 hover:bg-white/5 rounded-lg"
+                   >
+                     Fechar Aviso
+                   </button>
                 </div>
               </div>
             ) : (
-              <div className="bg-red-950/90 text-white px-4 py-3 rounded border border-red-500/50 flex items-start gap-3 backdrop-blur-md">
-                <AlertCircle className="w-5 h-5 shrink-0 text-red-500 mt-0.5" />
-                <div className="flex-1">
-                  <h4 className="font-bold text-xs uppercase tracking-wide text-red-200 mb-1">Erro no Sistema</h4>
-                  <p className="text-xs text-gray-300 leading-relaxed">{error}</p>
+              <div className="bg-slate-900 text-white p-6 rounded-xl border border-red-500/30 shadow-2xl max-w-md w-full relative">
+                <div className="flex items-start gap-4">
+                  <div className="p-3 bg-red-500/10 rounded-full shrink-0">
+                    <AlertCircle className="w-6 h-6 text-red-500" />
+                  </div>
+                  <div className="flex-1">
+                    <h4 className="font-bold text-lg uppercase tracking-wide text-white mb-2">Erro no Sistema</h4>
+                    <p className="text-sm text-slate-400 leading-relaxed mb-4">{error}</p>
+                    <button 
+                      onClick={() => setError(null)} 
+                      className="bg-slate-800 hover:bg-slate-700 text-white text-xs font-bold px-4 py-2 rounded-lg transition-colors uppercase"
+                    >
+                      Entendido
+                    </button>
+                  </div>
                 </div>
-                <button onClick={() => setError(null)} className="ml-2 text-gray-400 hover:text-white transition-colors">✕</button>
               </div>
             )}
           </div>
