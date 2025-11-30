@@ -39,7 +39,7 @@ export const ControlPanel: React.FC<ControlPanelProps> = ({
   palettes,
   fonts,
   onUpdate,
-  onGenerateImage,
+  onGenerateImage
 }) => {
   const [activeTab, setActiveTab] = useState<'editor' | 'studio'>('editor');
   const [isMagicLoading, setIsMagicLoading] = useState(false);
@@ -54,7 +54,7 @@ export const ControlPanel: React.FC<ControlPanelProps> = ({
         onUpdate('description', prompt);
         setActiveTab('studio');
       }
-    } catch (error) {
+    } catch (error: any) {
       console.error("Magic prompt error", error);
     } finally {
       setIsMagicLoading(false);
@@ -323,137 +323,6 @@ export const ControlPanel: React.FC<ControlPanelProps> = ({
                   GERAR CENÁRIO COM IA BASEADO NO TÍTULO
                 </button>
              </div>
-
-          </div>
-        )}
-
-        {/* --- TAB: STUDIO --- */}
-        {activeTab === 'studio' && (
-          <div className="space-y-8 animate-in fade-in slide-in-from-right-2 duration-300">
-            
-             {/* Upload Option */}
-             <div className="space-y-3">
-               <label className="text-[9px] text-slate-500 font-bold uppercase tracking-widest flex items-center gap-1"><Upload className="w-3 h-3"/> Upload Imagem Própria</label>
-               <div 
-                 onClick={() => fileInputRef.current?.click()}
-                 className="group cursor-pointer border-2 border-dashed border-slate-800 rounded-xl p-6 flex flex-col items-center justify-center gap-2 hover:border-red-500/50 hover:bg-slate-900 transition-all"
-               >
-                 <div className="p-3 bg-slate-900 rounded-full group-hover:bg-slate-800 transition-colors">
-                   <Upload className="w-5 h-5 text-slate-400 group-hover:text-red-500" />
-                 </div>
-                 <span className="text-[10px] font-bold text-slate-400 group-hover:text-slate-200">CLIQUE PARA CARREGAR</span>
-                 <input 
-                   type="file" 
-                   ref={fileInputRef} 
-                   onChange={handleImageUpload} 
-                   accept="image/*" 
-                   className="hidden" 
-                 />
-               </div>
-             </div>
-
-            {/* Prompt Box */}
-            <div className="space-y-3">
-               <label className="text-[9px] text-slate-500 font-bold uppercase tracking-widest flex items-center gap-1"><Zap className="w-3 h-3 text-yellow-500"/> Prompt Visual</label>
-               
-               <div className="bg-slate-900 border border-slate-800 rounded-xl p-1 shadow-inner focus-within:border-red-500/50 transition-colors">
-                 <textarea
-                   value={data.description}
-                   onChange={(e) => onUpdate('description', e.target.value)}
-                   placeholder="Descreva o cenário..."
-                   rows={4}
-                   className="w-full bg-transparent border-none p-3 text-slate-300 placeholder-slate-700 outline-none text-xs resize-none leading-relaxed font-mono"
-                 />
-                 <div className="flex justify-end px-2 pb-2">
-                    <span className="text-[9px] text-slate-600 font-mono">{data.description ? data.description.length : 0} chars</span>
-                 </div>
-               </div>
-
-               {/* Resolution Selection */}
-               <div className="space-y-2 pt-2">
-                 <label className="text-[9px] text-slate-500 font-bold uppercase tracking-widest flex items-center gap-1"><Ratio className="w-3 h-3"/> Formato / Resolução</label>
-                 <div className="grid grid-cols-4 gap-2">
-                    {RESOLUTIONS.map((res) => (
-                      <button
-                        key={res.id}
-                        onClick={() => onUpdate('aspectRatio', res.aspectRatio)}
-                        className={`flex flex-col items-center justify-center p-2 rounded-lg border transition-all ${
-                          data.aspectRatio === res.aspectRatio
-                          ? 'bg-slate-800 border-red-500 text-white shadow-sm'
-                          : 'bg-slate-900 border-slate-800 text-slate-500 hover:border-slate-700 hover:text-slate-300'
-                        }`}
-                      >
-                         <div className="mb-1">{res.icon}</div>
-                         <span className="text-[8px] font-bold uppercase text-center leading-tight">{res.label.split(' ')[0]}</span>
-                      </button>
-                    ))}
-                 </div>
-               </div>
-
-               <button
-                 onClick={onGenerateImage}
-                 disabled={data.isGenerating || !data.description}
-                 className={`w-full py-4 rounded-xl font-black text-xs uppercase tracking-widest flex items-center justify-center gap-2 transition-all shadow-lg mt-4 ${
-                    data.isGenerating || !data.description
-                    ? 'bg-slate-800 text-slate-600 border border-slate-700 cursor-not-allowed'
-                    : 'bg-red-600 hover:bg-red-500 text-white shadow-red-900/40 active:scale-[0.98]'
-                 }`}
-               >
-                  {data.isGenerating ? (
-                    <>
-                      <div className="animate-spin rounded-full h-3 w-3 border-2 border-white/30 border-t-white"></div>
-                      <span>Renderizando...</span>
-                    </>
-                  ) : (
-                    <>
-                      <ImageIcon className="w-4 h-4" />
-                      <span>RENDERIZAR FUNDO 4K</span>
-                    </>
-                  )}
-               </button>
-            </div>
-
-            {/* Visual Styles */}
-            <div className="space-y-3">
-               <label className="text-[9px] text-slate-500 font-bold uppercase tracking-widest">Estilo de Renderização</label>
-               <div className="grid grid-cols-2 gap-2">
-                  {STYLES.map((style) => (
-                    <button
-                      key={style.id}
-                      onClick={() => onUpdate('selectedStyleId', style.id)}
-                      className={`flex flex-col items-start gap-1 p-3 rounded-lg border transition-all ${
-                        data.selectedStyleId === style.id
-                          ? 'bg-slate-800 border-red-500/50 text-white shadow-md'
-                          : 'bg-slate-900 border-slate-800 text-slate-500 hover:border-slate-700 hover:text-slate-300'
-                      }`}
-                    >
-                       <span className="text-xl mb-1">{style.icon}</span>
-                       <span className="text-[9px] font-bold uppercase tracking-wider">{style.name}</span>
-                    </button>
-                  ))}
-               </div>
-            </div>
-
-            {/* Effects */}
-            <div className="space-y-3">
-               <label className="text-[9px] text-slate-500 font-bold uppercase tracking-widest flex items-center gap-1"><Sparkles className="w-3 h-3"/> Post-Processing</label>
-               <div className="grid grid-cols-3 gap-2">
-                  {OVERLAY_EFFECTS.map((effect) => (
-                     <button
-                        key={effect.id}
-                        onClick={() => onUpdate('selectedOverlayId', effect.id)}
-                        className={`aspect-square rounded-xl border flex flex-col items-center justify-center gap-2 transition-all group ${
-                           data.selectedOverlayId === effect.id
-                           ? 'bg-slate-800 border-red-500/50 text-white shadow-lg'
-                           : 'bg-slate-900 border-slate-800 text-slate-600 hover:border-slate-700 hover:text-slate-400'
-                        }`}
-                     >
-                        {effect.icon}
-                        <span className="text-[8px] font-bold uppercase">{effect.name}</span>
-                     </button>
-                  ))}
-               </div>
-            </div>
 
           </div>
         )}

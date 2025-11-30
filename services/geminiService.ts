@@ -87,8 +87,8 @@ export const generateImagePromptFromTitle = async (title: string): Promise<strin
       contents: prompt,
     });
     return response.text?.trim() || "";
-  } catch (e) {
-    console.error("Error generating prompt:", e);
+  } catch (error: any) {
+    console.error("Error generating prompt:", error);
     return "";
   }
 };

@@ -3,7 +3,7 @@
 import React, { useState, useCallback } from 'react';
 import { ControlPanel } from './components/ControlPanel';
 import { ThumbnailPreview } from './components/ThumbnailPreview';
-import { FONTS, PALETTES, STYLES, OVERLAY_EFFECTS, RESOLUTIONS } from './constants';
+import { FONTS, PALETTES, STYLES } from './constants';
 import { ThumbnailData } from './types';
 import { generateBackgroundImage } from './services/geminiService';
 import { AlertCircle } from 'lucide-react';
@@ -34,7 +34,7 @@ const DEFAULT_DATA: ThumbnailData = {
 function App() {
   const [data, setData] = useState<ThumbnailData>(DEFAULT_DATA);
   const [error, setError] = useState<string | null>(null);
-
+  
   const handleUpdate = useCallback((field: keyof ThumbnailData, value: any) => {
     setData((prev) => ({ ...prev, [field]: value }));
   }, []);
@@ -65,12 +65,7 @@ function App() {
       setData((prev) => ({ ...prev, bgImage: imageBase64 }));
     } catch (err: any) {
       console.error("App Generate Error:", err);
-      // Friendly message for missing API Key
-      if (err.message && err.message.includes("API Key")) {
-         setError("Chave de API não encontrada. Se você está no Vercel, adicione a variável de ambiente 'API_KEY' nas configurações do projeto.");
-      } else {
-         setError(err.message || "Erro desconhecido ao gerar imagem.");
-      }
+      setError(err.message || "Erro desconhecido ao gerar imagem.");
     } finally {
       setData((prev) => ({ ...prev, isGenerating: false }));
     }
