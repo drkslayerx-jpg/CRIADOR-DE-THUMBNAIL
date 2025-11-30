@@ -4,9 +4,9 @@ import { GoogleGenAI, GenerateContentResponse } from "@google/genai";
 const getApiKey = (): string => {
   // 1. Tenta ler do Vite (Padrão Moderno - VERCEL USA ESTE)
   try {
-    // @ts-ignore
-    if (import.meta && import.meta.env && import.meta.env.VITE_API_KEY) {
-      return import.meta.env.VITE_API_KEY;
+    const meta = import.meta as any;
+    if (meta && meta.env && meta.env.VITE_API_KEY) {
+      return meta.env.VITE_API_KEY;
     }
   } catch (e) {
     // ignore
