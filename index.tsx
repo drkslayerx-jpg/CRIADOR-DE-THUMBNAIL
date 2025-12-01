@@ -19,10 +19,14 @@ interface ErrorBoundaryState {
 
 // Fix: Extend React.Component directly and declare state property to resolve type errors
 class ErrorBoundary extends React.Component<ErrorBoundaryProps, ErrorBoundaryState> {
-  public state: ErrorBoundaryState = {
-    hasError: false,
-    error: null
-  };
+  // FIX: Using a constructor to initialize state to resolve potential tooling issues with class properties that might cause the 'props' not found error.
+  constructor(props: ErrorBoundaryProps) {
+    super(props);
+    this.state = {
+      hasError: false,
+      error: null
+    };
+  }
 
   static getDerivedStateFromError(error: Error): ErrorBoundaryState {
     return { hasError: true, error };
@@ -32,7 +36,7 @@ class ErrorBoundary extends React.Component<ErrorBoundaryProps, ErrorBoundarySta
     console.error("Uncaught error:", error, errorInfo);
   }
 
-  public render() {
+  render() {
     if (this.state.hasError) {
       return (
         <div className="h-screen w-screen bg-slate-950 flex flex-col items-center justify-center p-8 text-center font-sans">

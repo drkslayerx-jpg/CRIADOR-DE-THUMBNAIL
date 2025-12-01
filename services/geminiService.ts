@@ -1,31 +1,6 @@
 import { GoogleGenAI, GenerateContentResponse } from "@google/genai";
 
-// Helper para encontrar a chave em qualquer lugar (Vite, Vercel, React, Node)
-const getApiKey = (): string => {
-  // 1. Tenta ler do Vite (Padrão Moderno - VERCEL USA ESTE com import.meta.env)
-  try {
-    // Usando cast para any para evitar erros de tipagem do TS se o types não estiver configurado
-    const metaEnv = (import.meta as any).env;
-    if (metaEnv) {
-        if (metaEnv.VITE_API_KEY) return metaEnv.VITE_API_KEY;
-        if (metaEnv.API_KEY) return metaEnv.API_KEY;
-        if (metaEnv.REACT_APP_API_KEY) return metaEnv.REACT_APP_API_KEY;
-    }
-  } catch (e) {
-    // ignore error
-  }
-
-  // 2. Tenta ler do Process (Padrão Node/Legacy/CreateReactApp)
-  if (typeof process !== 'undefined' && process.env) {
-    if (process.env.VITE_API_KEY) return process.env.VITE_API_KEY;
-    if (process.env.REACT_APP_API_KEY) return process.env.REACT_APP_API_KEY;
-    if (process.env.API_KEY) return process.env.API_KEY;
-  }
-
-  // Se chegou aqui, não achou nenhuma chave
-  throw new Error("MISSING_KEY");
-};
-
+// FIX: Removed custom getApiKey function to adhere to the guideline of exclusively using process.env.API_KEY.
 export const generateBackgroundImage = async (
   title: string,
   description: string,
@@ -33,15 +8,8 @@ export const generateBackgroundImage = async (
   aspectRatio: string = "16:9"
 ): Promise<string> => {
   
-  let apiKey: string;
-  try {
-    apiKey = getApiKey();
-  } catch (e) {
-    throw new Error("MISSING_KEY");
-  }
-
-  // Initialize AI only when needed to prevent load-time crashes
-  const ai = new GoogleGenAI({ apiKey });
+  // FIX: Initialize the GoogleGenAI client directly with process.env.API_KEY as per guidelines.
+  const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
 
   const prompt = `
     Create a stunning, high-quality YouTube thumbnail background image.
@@ -62,13 +30,12 @@ export const generateBackgroundImage = async (
   try {
     const response: GenerateContentResponse = await ai.models.generateContent({
       model: 'gemini-2.5-flash-image',
-      contents: [
-        {
-          parts: [
-            { text: prompt }
-          ]
-        }
-      ],
+      // FIX: The 'contents' payload for image generation should be a single Content object, not an array, to match guideline examples.
+      contents: {
+        parts: [
+          { text: prompt }
+        ]
+      },
       config: {
         imageConfig: {
           aspectRatio: aspectRatio,
@@ -91,19 +58,15 @@ export const generateBackgroundImage = async (
   } catch (error: any) {
     console.error("Gemini Error:", error);
     
-    // Catch common "Key missing" errors from Google and convert to our standard
-    if (error.message?.toLowerCase().includes("api key") || error.status === 403) {
-      throw new Error("MISSING_KEY");
-    }
-    
+    // FIX: Removed custom "MISSING_KEY" error handling to let the original API error bubble up.
     throw error;
   }
 };
 
 export const generateImagePromptFromTitle = async (title: string): Promise<string> => {
   try {
-    const apiKey = getApiKey();
-    const ai = new GoogleGenAI({ apiKey });
+    // FIX: Initialize the GoogleGenAI client directly with process.env.API_KEY as per guidelines.
+    const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
 
     const prompt = `
       Based on the YouTube Video Title: "${title}", write a detailed visual description for a thumbnail background image.
@@ -124,7 +87,7 @@ export const generateImagePromptFromTitle = async (title: string): Promise<strin
     return response.text?.trim() || "";
   } catch (error: any) {
     console.error("Error generating prompt:", error);
-    if (error.message === "MISSING_KEY") return ""; // Silent fail for magic prompt
+    // FIX: Removed custom "MISSING_KEY" error check. The function will silently fail on any error as before.
     return "";
   }
 };
