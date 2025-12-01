@@ -9,6 +9,7 @@ const getApiKey = (): string => {
     if (metaEnv) {
         if (metaEnv.VITE_API_KEY) return metaEnv.VITE_API_KEY;
         if (metaEnv.API_KEY) return metaEnv.API_KEY;
+        if (metaEnv.REACT_APP_API_KEY) return metaEnv.REACT_APP_API_KEY;
     }
   } catch (e) {
     // ignore error
