@@ -309,37 +309,41 @@ export const ThumbnailPreview: React.FC<ThumbnailPreviewProps> = ({
               onMouseDown={handleMouseDown}
             >
               
-              <div className="group/text relative">
-                {/* Drag Indicator (Hover Only) */}
-                <div className="absolute -inset-4 border-2 border-dashed border-white/20 rounded-lg opacity-0 group-hover/text:opacity-100 transition-opacity pointer-events-none flex items-center justify-center">
-                    <div className="bg-black/50 text-white text-[9px] px-2 py-1 rounded font-mono uppercase tracking-widest backdrop-blur-sm">
-                       <Move className="w-3 h-3 inline mr-1"/>
-                       Arraste
-                    </div>
-                </div>
-
-                {data.subtitle && (
-                  <div 
-                    className="inline-block px-4 py-1.5 mb-3 transform -skew-x-6 shadow-2xl backdrop-blur-sm"
-                    style={{ backgroundColor: data.subtitleColor || selectedPalette.colors.secondary }}
-                  >
-                    <span className="block transform skew-x-6 text-white font-black uppercase tracking-[0.15em] text-lg lg:text-xl drop-shadow-md">
-                      {data.subtitle}
-                    </span>
+              {(data.title || data.subtitle) && (
+                <div className="group/text relative">
+                  {/* Drag Indicator (Hover Only) */}
+                  <div className="absolute -inset-4 border-2 border-dashed border-white/20 rounded-lg opacity-0 group-hover/text:opacity-100 transition-opacity pointer-events-none flex items-center justify-center">
+                      <div className="bg-black/50 text-white text-[9px] px-2 py-1 rounded font-mono uppercase tracking-widest backdrop-blur-sm">
+                         <Move className="w-3 h-3 inline mr-1"/>
+                         Arraste
+                      </div>
                   </div>
-                )}
 
-                <h1 
-                  className="text-6xl lg:text-8xl font-black leading-[0.85] uppercase max-w-full break-words tracking-tighter filter drop-shadow-2xl"
-                  style={{ 
-                    color: data.titleColor || selectedPalette.colors.primary,
-                    WebkitTextStroke: '1px rgba(0,0,0,0.1)', // Subtle stroke for definition
-                    textShadow: `${data.shadowColor || selectedPalette.colors.textShadow}, 0 10px 40px rgba(0,0,0,0.8)`,
-                  }}
-                >
-                  {data.title || "TÍTULO AQUI"}
-                </h1>
-              </div>
+                  {data.subtitle && (
+                    <div 
+                      className="inline-block px-4 py-1.5 mb-3 transform -skew-x-6 shadow-2xl backdrop-blur-sm"
+                      style={{ backgroundColor: data.subtitleColor || selectedPalette.colors.secondary }}
+                    >
+                      <span className="block transform skew-x-6 text-white font-black uppercase tracking-[0.15em] text-lg lg:text-xl drop-shadow-md">
+                        {data.subtitle}
+                      </span>
+                    </div>
+                  )}
+
+                  {data.title && (
+                    <h1 
+                      className="text-6xl lg:text-8xl font-black leading-[0.85] uppercase max-w-full break-words tracking-tighter filter drop-shadow-2xl"
+                      style={{ 
+                        color: data.titleColor || selectedPalette.colors.primary,
+                        WebkitTextStroke: '1px rgba(0,0,0,0.1)', // Subtle stroke for definition
+                        textShadow: `${data.shadowColor || selectedPalette.colors.textShadow}, 0 10px 40px rgba(0,0,0,0.8)`,
+                      }}
+                    >
+                      {data.title}
+                    </h1>
+                  )}
+                </div>
+              )}
             </div>
 
             {/* LAYER 4: YouTube UI Simulator - Only show on 16:9 for accuracy */}
