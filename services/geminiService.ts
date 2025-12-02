@@ -1,4 +1,26 @@
+// Polyfill/Bridge to make Vercel/Vite env variables work with the required `process.env.API_KEY`
+// This must run before any function tries to use it.
+if (typeof process === 'undefined') {
+  // @ts-ignore
+  globalThis.process = { env: {} };
+}
+// Use Vite's way of accessing env vars and bridge it to process.env
+// Cast to `any` to prevent TypeScript errors in environments where import.meta is not standard
+const viteApiKey = (import.meta as any).env?.VITE_API_KEY;
+if (viteApiKey) {
+  process.env.API_KEY = viteApiKey;
+}
+
+
 import { GoogleGenAI, GenerateContentResponse } from "@google/genai";
+
+const getApiKey = (): string => {
+  const key = process.env.API_KEY;
+  if (!key) {
+    throw new Error("MISSING_API_KEY");
+  }
+  return key;
+}
 
 export const generateBackgroundImage = async (
   title: string,
@@ -7,8 +29,8 @@ export const generateBackgroundImage = async (
   aspectRatio: string = "16:9"
 ): Promise<string> => {
   try {
-    // FIX: Initialize GoogleGenAI with process.env.API_KEY as per guidelines.
-    const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
+    const apiKey = getApiKey();
+    const ai = new GoogleGenAI({ apiKey });
 
     const prompt = `
       Create a stunning, high-quality YouTube thumbnail background image.
@@ -38,6 +60,9 @@ export const generateBackgroundImage = async (
 
   } catch (error: any) {
     console.error("Gemini Error:", error);
+    if (error.message.includes('API key not valid')) {
+       throw new Error("MISSING_API_KEY");
+    }
     // Re-throw the error to be caught by the App component
     throw error;
   }
@@ -45,8 +70,8 @@ export const generateBackgroundImage = async (
 
 export const generateImagePromptFromTitle = async (title: string): Promise<string> => {
   try {
-    // FIX: Initialize GoogleGenAI with process.env.API_KEY as per guidelines.
-    const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
+    const apiKey = getApiKey();
+    const ai = new GoogleGenAI({ apiKey });
 
     const prompt = `
       Based on the YouTube Video Title: "${title}", write a detailed visual description for a thumbnail background image.

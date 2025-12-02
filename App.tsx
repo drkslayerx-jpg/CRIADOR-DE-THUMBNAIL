@@ -70,7 +70,11 @@ function App() {
       setData((prev) => ({ ...prev, bgImage: imageBase64 }));
     } catch (err: any) {
       console.error("App Generate Error:", err);
-      setError(err.message || "Erro desconhecido ao gerar imagem.");
+      let errorMessage = err.message || "Erro desconhecido ao gerar imagem.";
+      if (errorMessage.includes("quota")) {
+        errorMessage = "Limite de uso da IA atingido. A cota da sua chave gratuita esgotou por hoje. Tente novamente mais tarde ou use outra chave.";
+      }
+      setError(errorMessage);
     } finally {
       setData((prev) => ({ ...prev, isGenerating: false }));
     }
@@ -78,6 +82,8 @@ function App() {
 
   const selectedPalette = PALETTES.find((p) => p.id === data.selectedPaletteId) || PALETTES[0];
   const selectedFont = FONTS.find((f) => f.id === data.selectedFontId) || FONTS[0];
+
+  const isApiKeyError = error && (error.toLowerCase().includes('api key') || error.includes('MISSING_KEY'));
 
   return (
     <div className="flex flex-col lg:flex-row h-screen w-screen bg-slate-950 text-white font-sans overflow-hidden selection:bg-red-500/30 selection:text-red-200">
@@ -94,8 +100,46 @@ function App() {
 
       <div className="order-1 lg:order-2 flex-1 relative h-[55%] lg:h-full flex flex-col z-10 bg-slate-950">
         
-        {/* FIX: Removed API key check UI per guidelines. The generic error display is kept. */}
-        {error && (
+        {isApiKeyError ? (
+          <div className="absolute inset-0 z-[100] flex items-center justify-center bg-slate-950/90 backdrop-blur-md p-4 animate-in fade-in zoom-in-95 duration-200">
+             <div className="bg-gradient-to-br from-slate-900 to-slate-950 text-white p-6 rounded-2xl border border-red-500/30 shadow-2xl max-w-lg w-full relative ring-1 ring-red-900/20">
+                <div className="text-center mb-6">
+                    <div className="w-16 h-16 bg-red-950/50 rounded-full flex items-center justify-center mx-auto mb-4 border border-red-500/20">
+                       <ShieldAlert className="w-8 h-8 text-red-500"/>
+                    </div>
+                    <h2 className="text-xl font-black text-white uppercase tracking-wider">Configuração Pendente</h2>
+                    <p className="text-xs text-red-400 font-mono tracking-widest">SERVIDOR VERCEL NÃO AUTENTICADO</p>
+                </div>
+
+                <div className="bg-slate-900/50 p-4 rounded-lg border border-slate-800 space-y-4 text-sm">
+                    <p className="text-slate-300 leading-relaxed flex items-start gap-3"><AlertCircle className="w-5 h-5 text-yellow-500 shrink-0 mt-0.5"/> A Inteligência Artificial precisa ser ativada no painel do servidor para funcionar. Siga os passos abaixo:</p>
+                    
+                    <ol className="list-decimal list-inside space-y-3 text-slate-400 pl-2">
+                      <li>Acesse o painel do seu projeto na <a href="https://vercel.com" target="_blank" className="font-bold text-cyan-400 hover:underline">Vercel</a>.</li>
+                      <li>Vá em <strong className="text-slate-200">Settings &rarr; Environment Variables</strong>.</li>
+                      <li className="space-y-2">
+                        <span>Adicione a variável de ambiente:</span>
+                        <div className="bg-slate-950 p-3 rounded-md border border-slate-700 text-xs font-mono">
+                          <div><span className="text-slate-500">Key:</span> <span className="text-red-400 ml-2">VITE_API_KEY</span></div>
+                          <div className="mt-1"><span className="text-slate-500">Value:</span><span className="text-green-400 ml-2">Sua Chave Gemini...</span></div>
+                        </div>
+                      </li>
+                      <li>Faça um <strong className="text-slate-200">Redeploy</strong> para aplicar.</li>
+                    </ol>
+                </div>
+                
+                <div className="mt-6 text-center flex items-center justify-between bg-slate-900/30 px-4 py-2 rounded-lg">
+                    <span className="text-[10px] font-mono text-slate-600 tracking-widest">SC SYSTEM ADMIN</span>
+                    <button 
+                     onClick={() => setError(null)} 
+                     className="bg-red-800/50 hover:bg-red-700/50 border border-red-500/20 text-white text-xs font-bold px-4 py-2 rounded-lg transition-colors uppercase"
+                   >
+                     Fechar Aviso
+                   </button>
+                </div>
+             </div>
+          </div>
+        ) : error && (
           <div className="absolute inset-0 z-[100] flex items-center justify-center bg-slate-950/90 backdrop-blur-md p-4 animate-in fade-in zoom-in-95 duration-200">
              <div className="bg-slate-900 text-white p-6 rounded-xl border border-red-500/30 shadow-2xl max-w-md w-full relative">
                <div className="flex items-start gap-4">
