@@ -6,7 +6,7 @@ import { ThumbnailPreview } from './components/ThumbnailPreview';
 import { FONTS, PALETTES, STYLES } from './constants';
 import { ThumbnailData } from './types';
 import { generateBackgroundImage } from './services/geminiService';
-import { AlertCircle, ShieldAlert, X } from 'lucide-react';
+import { AlertCircle, ShieldAlert, X, Settings, ExternalLink } from 'lucide-react';
 
 const DEFAULT_PALETTE = PALETTES[4]; // Candy Pop as default example
 
@@ -19,12 +19,10 @@ const DEFAULT_DATA: ThumbnailData = {
   selectedFontId: FONTS[1].id,
   selectedStyleId: STYLES[4].id,
   
-  // Initialize colors explicitly
   titleColor: DEFAULT_PALETTE.colors.primary,
   subtitleColor: DEFAULT_PALETTE.colors.secondary,
-  shadowColor: '#000000', // Default shadow base
+  shadowColor: '#000000',
   
-  // Default to YouTube Standard
   aspectRatio: '16:9',
 
   textAlignment: 'center',
@@ -72,7 +70,6 @@ function App() {
       setData((prev) => ({ ...prev, bgImage: imageBase64 }));
     } catch (err: any) {
       console.error("App Generate Error:", err);
-      // Pass the raw error message to state to trigger specific modals
       setError(err.message || "Erro desconhecido ao gerar imagem.");
     } finally {
       setData((prev) => ({ ...prev, isGenerating: false }));
@@ -82,13 +79,9 @@ function App() {
   const selectedPalette = PALETTES.find((p) => p.id === data.selectedPaletteId) || PALETTES[0];
   const selectedFont = FONTS.find((f) => f.id === data.selectedFontId) || FONTS[0];
 
-  // FIX: Removed specific check for API Key error to comply with guidelines.
-  // The generic error modal will now handle all errors.
-
   return (
     <div className="flex flex-col lg:flex-row h-screen w-screen bg-slate-950 text-white font-sans overflow-hidden selection:bg-red-500/30 selection:text-red-200">
       
-      {/* Control Panel */}
       <div className="order-2 lg:order-1 h-[45%] lg:h-full w-full lg:w-auto flex-shrink-0 z-40">
         <ControlPanel
           data={data}
@@ -99,12 +92,9 @@ function App() {
         />
       </div>
 
-      {/* Main Preview */}
       <div className="order-1 lg:order-2 flex-1 relative h-[55%] lg:h-full flex flex-col z-10 bg-slate-950">
         
-        {/* FIX: Removed custom modal for API key configuration as per guidelines. */}
-
-        {/* FIX: Changed condition to show generic error modal for any error, including API key issues. */}
+        {/* FIX: Removed API key check UI per guidelines. The generic error display is kept. */}
         {error && (
           <div className="absolute inset-0 z-[100] flex items-center justify-center bg-slate-950/90 backdrop-blur-md p-4 animate-in fade-in zoom-in-95 duration-200">
              <div className="bg-slate-900 text-white p-6 rounded-xl border border-red-500/30 shadow-2xl max-w-md w-full relative">
