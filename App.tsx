@@ -83,7 +83,8 @@ function App() {
   const selectedPalette = PALETTES.find((p) => p.id === data.selectedPaletteId) || PALETTES[0];
   const selectedFont = FONTS.find((f) => f.id === data.selectedFontId) || FONTS[0];
 
-  const isApiKeyError = error && (error.toLowerCase().includes('api key') || error.includes('MISSING_KEY'));
+  // CORREÇÃO: Lógica simplificada para garantir que a tela de ajuda correta seja exibida.
+  const isApiKeyError = error === 'MISSING_API_KEY';
 
   return (
     <div className="flex flex-col lg:flex-row h-screen w-screen bg-slate-950 text-white font-sans overflow-hidden selection:bg-red-500/30 selection:text-red-200">
